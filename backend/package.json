@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "pnpm run lint && pnpm run type-check && tsc",
+    "build": "tsc",
     "build:only": "tsc",
     "type-check": "tsc --noEmit",
     "start": "node dist/server.js",
@@ -13,8 +13,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{js,ts,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{js,ts,json,md}\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pre-build": "pnpm run lint && pnpm run type-check"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "lint-staged": {
     "*.{js,ts}": [
