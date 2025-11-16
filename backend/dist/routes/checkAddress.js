@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { checkAddress } from '../services/blockchair.js';
+import { checkAddress } from '../../dist/services/blockchair.js';
 const router = Router();
 router.post('/check-address', async (req, res) => {
     try {
