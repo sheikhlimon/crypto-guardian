@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import LiquidGlass from 'liquid-glass-react'
 import { Search, AlertCircle } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
@@ -33,14 +32,14 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
   }
 
   // Debounced validation
-  const debouncedValidation = debounce((value: string) => {
-    if (touched) {
+  const debouncedValidation = debounce((value: unknown) => {
+    if (touched && typeof value === 'string') {
       validateAddress(value)
     }
   }, 300)
 
   // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: { target: { value: string } }) => {
     const value = e.target.value
     setAddress(value)
     debouncedValidation(value)
@@ -84,22 +83,22 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
       'w-full px-4 py-4 text-lg rounded-xl transition-all duration-200 focus:outline-none'
 
     if (error) {
-      return `${baseClasses} bg-white/60 border-2 border-red-300/60 text-red-900 backdrop-blur-sm`
+      return `${baseClasses} bg-white/60 border-2 border-red-300/60 text-red-900 backdrop-blur-sm focus:border-red-500 focus:ring-2 focus:ring-red-200`
     }
 
     if (address && !error && touched) {
-      return `${baseClasses} bg-white/60 border-2 border-green-300/60 text-green-900 backdrop-blur-sm`
+      return `${baseClasses} bg-white/60 border-2 border-green-300/60 text-green-900 backdrop-blur-sm focus:border-green-500 focus:ring-2 focus:ring-green-200`
     }
 
-    return `${baseClasses} bg-white/60 border-2 border-white/40 text-gray-900 backdrop-blur-sm`
+    return `${baseClasses} bg-white/60 border-2 border-white/40 text-gray-900 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200`
   }
 
   return (
-    <div className='w-full max-w-2xl mx-auto'>
-      <LiquidGlass mode='standard' blurAmount={0.0625} className='relative'>
-        <form onSubmit={handleSubmit} className='relative'>
+    <div className='w-full'>
+      <div className='bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm'>
+        <form onSubmit={handleSubmit}>
           {/* Input container */}
-          <div className='relative'>
+          <div className='relative mb-4'>
             <input
               type='text'
               value={address}
@@ -124,48 +123,33 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
           {/* Error message */}
           {error && (
-            <div className='mt-2 flex items-center space-x-2 text-red-600 text-sm'>
-              <AlertCircle className='h-4 w-4' />
+            <div className='mb-4 flex items-center space-x-2 text-red-600 text-sm'>
+              <AlertCircle className='h-4 w-4 flex-shrink-0' />
               <span>{error}</span>
             </div>
           )}
 
           {/* Submit button */}
-          <LiquidGlass
-            mode='standard'
-            blurAmount={address && !error && !isLoading ? 0.0625 : 0.03125}
+          <button
+            type='submit'
+            disabled={!address || !!error || isLoading}
             className={`
-            w-full mt-4 px-6 py-4 text-lg font-semibold rounded-xl 
-            transition-all duration-300 focus:outline-none
-            ${address && !error && !isLoading ? 'hover:scale-105' : 'opacity-50'}
+            w-full px-6 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white
+            transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            ${address && !error && !isLoading ? 'hover:shadow-lg hover:scale-[1.02]' : 'opacity-50 cursor-not-allowed'}
           `}
           >
-            <button
-              type='submit'
-              disabled={!address || !!error || isLoading}
-              className={`
-              w-full bg-transparent border-0 font-bold focus:outline-none
-              ${
-                address && !error && !isLoading
-                  ? 'gradient-text'
-                  : 'text-gray-400 cursor-not-allowed'
-              }
-            `}
-            >
-              {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
-            </button>
-          </LiquidGlass>
+            {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
+          </button>
         </form>
-      </LiquidGlass>
+      </div>
 
       {/* Help text */}
-      <LiquidGlass
-        mode='standard'
-        blurAmount={0.03125}
-        className='mt-6 text-center text-sm text-gray-500 p-4 rounded-lg'
-      >
-        <p>Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains</p>
-      </LiquidGlass>
+      <div className='mt-4 text-center'>
+        <div className='inline-block text-sm text-gray-500 px-4 py-2 bg-gray-100 rounded-lg'>
+          <p>Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains</p>
+        </div>
+      </div>
     </div>
   )
 }

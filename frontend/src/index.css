@@ -9,10 +9,7 @@
 
   body {
     @apply font-sans antialiased min-h-screen;
-    background:
-      radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-      linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   }
 }
 
@@ -123,11 +120,13 @@
   }
 
   .floating-orb {
-    position: absolute;
+    position: fixed;
     border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.6;
-    animation: float 20s infinite ease-in-out;
+    filter: blur(60px);
+    opacity: 0.15;
+    animation: float 30s infinite ease-in-out;
+    z-index: 0;
+    pointer-events: none;
   }
 
   @keyframes float {

@@ -1,4 +1,3 @@
-import LiquidGlass from 'liquid-glass-react'
 import { Shield, AlertTriangle, XCircle, TrendingUp, DollarSign, Activity } from 'lucide-react'
 import { formatCurrency, formatAddress, getRiskColor } from '../utils/fp'
 import type { AddressCheckResponse } from '../types/api'
@@ -61,94 +60,92 @@ export default function ResultCard({ result }: ResultCardProps) {
   return (
     <div className='w-full space-y-6'>
       {/* Main Result Card */}
-      <LiquidGlass
-        mode='standard'
-        blurAmount={0.0625}
+      <div
         className={`
-          rounded-2xl p-8 border-2 ${riskDetails.borderColor}
-          ${riskDetails.bgClass} ${riskDetails.textColor}
-        `}
+        bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 shadow-sm
+        ${riskDetails.borderColor}
+      `}
       >
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4'>
           <div className='flex items-center space-x-4'>
-            <LiquidGlass
-              mode='standard'
-              blurAmount={0.03125}
+            <div
               className={`
-                p-3 rounded-xl
-                ${riskColor === 'green' ? 'text-green-600' : ''}
-                ${riskColor === 'yellow' ? 'text-amber-600' : ''}
-                ${riskColor === 'red' ? 'text-red-600' : ''}
-                ${riskColor === 'gray' ? 'text-gray-600' : ''}
-              `}
+              p-3 rounded-xl
+              ${riskColor === 'green' ? 'bg-green-100 text-green-600' : ''}
+              ${riskColor === 'yellow' ? 'bg-amber-100 text-amber-600' : ''}
+              ${riskColor === 'red' ? 'bg-red-100 text-red-600' : ''}
+              ${riskColor === 'gray' ? 'bg-gray-100 text-gray-600' : ''}
+            `}
             >
               <Icon className='h-8 w-8' />
-            </LiquidGlass>
+            </div>
             <div>
-              <h2 className='text-2xl font-bold'>{riskDetails.title}</h2>
-              <p className='text-sm opacity-80 mt-1'>{riskDetails.description}</p>
+              <h2 className='text-xl sm:text-2xl font-bold text-gray-900'>{riskDetails.title}</h2>
+              <p className='text-sm text-gray-600 mt-1'>{riskDetails.description}</p>
             </div>
           </div>
 
           {/* Risk Score */}
           <div className='text-center'>
-            <div className='text-4xl font-bold'>{riskScore}</div>
-            <div className='text-sm opacity-80'>Risk Score</div>
+            <div className='text-3xl sm:text-4xl font-bold text-gray-900'>{riskScore}</div>
+            <div className='text-sm text-gray-600'>Risk Score</div>
           </div>
         </div>
 
         {/* Address Display */}
-        <LiquidGlass mode='standard' blurAmount={0.03125} className='mt-6 p-4 rounded-lg'>
-          <div className='text-sm opacity-80 mb-1'>Address</div>
-          <div className='font-mono text-lg font-semibold'>{formatAddress(result.address, 8)}</div>
-        </LiquidGlass>
+        <div className='mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200/50'>
+          <div className='text-sm text-gray-600 mb-1'>Address</div>
+          <div className='font-mono text-base sm:text-lg font-semibold text-gray-900 break-all'>
+            {formatAddress(result.address, 8)}
+          </div>
+        </div>
 
         {/* Recommendation */}
-        <LiquidGlass mode='standard' blurAmount={0.03125} className='mt-6 p-4 rounded-lg'>
-          <div className='font-semibold mb-2'>Recommendation</div>
-          <div className='text-sm opacity-90'>{result.recommendation}</div>
-        </LiquidGlass>
-      </LiquidGlass>
+        <div className='mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200/50'>
+          <div className='font-semibold text-gray-900 mb-2'>Recommendation</div>
+          <div className='text-sm text-gray-700'>{result.recommendation}</div>
+        </div>
+      </div>
 
       {/* Stats Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <LiquidGlass mode='standard' blurAmount={0.0625} className='p-6 rounded-xl'>
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
           <div className='flex items-center space-x-3'>
-            <LiquidGlass mode='standard' blurAmount={0.03125} className='p-2 rounded-lg'>
+            <div className='w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center'>
               <Activity className='h-5 w-5 text-blue-600' />
-            </LiquidGlass>
+            </div>
             <div>
               <div className='text-sm text-gray-600'>Transactions</div>
-              <div className='text-xl font-semibold text-gray-900'>
+              <div className='text-lg font-semibold text-gray-900'>
                 {result.transaction_count?.toLocaleString() || 'N/A'}
               </div>
             </div>
           </div>
-        </LiquidGlass>
+        </div>
 
-        <LiquidGlass mode='standard' blurAmount={0.0625} className='p-6 rounded-xl'>
+        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
           <div className='flex items-center space-x-3'>
-            <LiquidGlass mode='standard' blurAmount={0.03125} className='p-2 rounded-lg'>
+            <div className='w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center'>
               <DollarSign className='h-5 w-5 text-green-600' />
-            </LiquidGlass>
+            </div>
             <div>
               <div className='text-sm text-gray-600'>Total Value</div>
-              <div className='text-xl font-semibold text-gray-900'>
+              <div className='text-lg font-semibold text-gray-900'>
                 {result.total_value ? formatCurrency(result.total_value) : 'N/A'}
               </div>
             </div>
           </div>
-        </LiquidGlass>
+        </div>
 
-        <LiquidGlass mode='standard' blurAmount={0.0625} className='p-6 rounded-xl'>
+        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
           <div className='flex items-center space-x-3'>
-            <LiquidGlass mode='standard' blurAmount={0.03125} className='p-2 rounded-lg'>
+            <div className='w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center'>
               <TrendingUp className='h-5 w-5 text-purple-600' />
-            </LiquidGlass>
+            </div>
             <div>
               <div className='text-sm text-gray-600'>Risk Level</div>
               <div
-                className={`text-xl font-semibold capitalize ${
+                className={`text-lg font-semibold capitalize ${
                   riskColor === 'green'
                     ? 'text-green-600'
                     : riskColor === 'yellow'
@@ -162,21 +159,16 @@ export default function ResultCard({ result }: ResultCardProps) {
               </div>
             </div>
           </div>
-        </LiquidGlass>
+        </div>
       </div>
 
       {/* Findings Section */}
       {result.findings && result.findings.length > 0 && (
-        <LiquidGlass mode='standard' blurAmount={0.0625} className='rounded-xl p-6'>
+        <div className='bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm'>
           <h3 className='text-lg font-semibold text-gray-900 mb-4'>Analysis Findings</h3>
           <div className='space-y-3'>
             {result.findings.map((finding, index) => (
-              <LiquidGlass
-                key={index}
-                mode='standard'
-                blurAmount={0.03125}
-                className='flex items-start space-x-3 p-3 rounded-lg'
-              >
+              <div key={index} className='flex items-start space-x-3 p-3 bg-gray-50 rounded-lg'>
                 <div
                   className={`
                   w-2 h-2 rounded-full mt-2 flex-shrink-0
@@ -192,10 +184,10 @@ export default function ResultCard({ result }: ResultCardProps) {
                 `}
                 />
                 <div className='text-sm text-gray-700'>{finding}</div>
-              </LiquidGlass>
+              </div>
             ))}
           </div>
-        </LiquidGlass>
+        </div>
       )}
     </div>
   )
