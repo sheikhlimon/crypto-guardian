@@ -33,11 +33,11 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "node-cache": "^5.1.2",
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "@types/express": "^5.0.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.5",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2"
   }
