@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import checkAddressRoutes from './routes/checkAddress.js';
+import checkAddressRoutes from './routes/checkAddress';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
