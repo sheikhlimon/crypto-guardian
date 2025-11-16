@@ -10,7 +10,9 @@
   ],
   "scripts": {
     "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -r build",
+    "build": "pnpm run build:frontend && pnpm run build:backend",
+    "build:frontend": "pnpm run build --workspace=frontend",
+    "build:backend": "pnpm run build --workspace=backend",
     "type-check": "pnpm -r type-check",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",

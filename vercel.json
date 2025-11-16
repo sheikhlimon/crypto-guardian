@@ -1,6 +1,19 @@
 {
-  "buildCommand": "cd frontend && npm run build",
+  "version": 2,
+  "buildCommand": "pnpm build",
   "outputDirectory": "frontend/dist",
   "installCommand": "pnpm install",
-  "framework": "vite"
+  "framework": "vite",
+  "rootDirectory": ".",
+  "functions": {
+    "backend/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/backend/$1"
+    }
+  ]
 }
