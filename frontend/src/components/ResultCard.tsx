@@ -1,5 +1,6 @@
 import { Shield, AlertTriangle, XCircle, TrendingUp, DollarSign, Activity } from 'lucide-react'
 import { formatCurrency, formatAddress, getRiskColor } from '../utils/fp'
+import { useTheme } from '../contexts/ThemeContext'
 import type { AddressCheckResponse } from '../types/api'
 
 interface ResultCardProps {
@@ -7,6 +8,7 @@ interface ResultCardProps {
 }
 
 export default function ResultCard({ result }: ResultCardProps) {
+  const { isDarkMode } = useTheme()
   const riskLevel = result.verdict.toLowerCase()
   const riskColor = getRiskColor(result.verdict)
   const riskScore = result.risk_score
@@ -62,7 +64,7 @@ export default function ResultCard({ result }: ResultCardProps) {
       {/* Main Result Card */}
       <div
         className={`
-        bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 shadow-sm
+        ${riskDetails.bgClass} rounded-2xl p-6 border-2
         ${riskDetails.borderColor}
       `}
       >
@@ -70,89 +72,137 @@ export default function ResultCard({ result }: ResultCardProps) {
           <div className='flex items-center space-x-4'>
             <div
               className={`
-              p-3 rounded-xl
-              ${riskColor === 'green' ? 'bg-green-100 text-green-600' : ''}
-              ${riskColor === 'yellow' ? 'bg-amber-100 text-amber-600' : ''}
-              ${riskColor === 'red' ? 'bg-red-100 text-red-600' : ''}
-              ${riskColor === 'gray' ? 'bg-gray-100 text-gray-600' : ''}
+              glass-morphism-dark p-3 rounded-xl
+              ${riskColor === 'green' ? 'text-green-400' : ''}
+              ${riskColor === 'yellow' ? 'text-amber-400' : ''}
+              ${riskColor === 'red' ? 'text-red-400' : ''}
+              ${riskColor === 'gray' ? 'text-gray-400' : ''}
             `}
             >
               <Icon className='h-8 w-8' />
             </div>
             <div>
-              <h2 className='text-xl sm:text-2xl font-bold text-gray-900'>{riskDetails.title}</h2>
-              <p className='text-sm text-gray-600 mt-1'>{riskDetails.description}</p>
+              <h2
+                className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+              >
+                {riskDetails.title}
+              </h2>
+              <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                {riskDetails.description}
+              </p>
             </div>
           </div>
 
           {/* Risk Score */}
           <div className='text-center'>
-            <div className='text-3xl sm:text-4xl font-bold text-gray-900'>{riskScore}</div>
-            <div className='text-sm text-gray-600'>Risk Score</div>
+            <div
+              className={`text-3xl sm:text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              {riskScore}
+            </div>
+            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              Risk Score
+            </div>
           </div>
         </div>
 
         {/* Address Display */}
-        <div className='mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200/50'>
-          <div className='text-sm text-gray-600 mb-1'>Address</div>
-          <div className='font-mono text-base sm:text-lg font-semibold text-gray-900 break-all'>
+        <div
+          className={`glass-morphism-dark mt-4 p-4 rounded-lg ${isDarkMode ? '' : 'bg-white/10'}`}
+        >
+          <div className={`text-sm mb-1 ${isDarkMode ? 'text-gray-300' : 'text-white/80'}`}>
+            Address
+          </div>
+          <div
+            className={`font-mono text-base sm:text-lg font-semibold break-all ${isDarkMode ? 'text-gray-100' : 'text-white'}`}
+          >
             {formatAddress(result.address, 8)}
           </div>
         </div>
 
         {/* Recommendation */}
-        <div className='mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200/50'>
-          <div className='font-semibold text-gray-900 mb-2'>Recommendation</div>
-          <div className='text-sm text-gray-700'>{result.recommendation}</div>
+        <div
+          className={`glass-morphism-dark mt-4 p-4 rounded-lg ${isDarkMode ? '' : 'bg-white/10'}`}
+        >
+          <div className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-white'}`}>
+            Recommendation
+          </div>
+          <div className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-white/90'}`}>
+            {result.recommendation}
+          </div>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
-        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
+        <div className='glass-card p-4 rounded-xl'>
           <div className='flex items-center space-x-3'>
-            <div className='w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center'>
-              <Activity className='h-5 w-5 text-blue-600' />
+            <div
+              className={`glass-morphism-dark w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-slate-600/30' : ''}`}
+            >
+              <Activity className={`h-5 w-5 ${isDarkMode ? 'text-gray-200' : 'text-white'}`} />
             </div>
             <div>
-              <div className='text-sm text-gray-600'>Transactions</div>
-              <div className='text-lg font-semibold text-gray-900'>
+              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Transactions
+              </div>
+              <div
+                className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+              >
                 {result.transaction_count?.toLocaleString() || 'N/A'}
               </div>
             </div>
           </div>
         </div>
 
-        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
+        <div className='glass-card p-4 rounded-xl'>
           <div className='flex items-center space-x-3'>
-            <div className='w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center'>
-              <DollarSign className='h-5 w-5 text-green-600' />
+            <div
+              className={`glass-morphism-dark w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-slate-600/30' : ''}`}
+            >
+              <DollarSign className={`h-5 w-5 ${isDarkMode ? 'text-gray-200' : 'text-white'}`} />
             </div>
             <div>
-              <div className='text-sm text-gray-600'>Total Value</div>
-              <div className='text-lg font-semibold text-gray-900'>
+              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Total Value
+              </div>
+              <div
+                className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+              >
                 {result.total_value ? formatCurrency(result.total_value) : 'N/A'}
               </div>
             </div>
           </div>
         </div>
 
-        <div className='bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 shadow-sm'>
+        <div className='glass-card p-4 rounded-xl'>
           <div className='flex items-center space-x-3'>
-            <div className='w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center'>
-              <TrendingUp className='h-5 w-5 text-purple-600' />
+            <div
+              className={`glass-morphism-dark w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-slate-600/30' : ''}`}
+            >
+              <TrendingUp className={`h-5 w-5 ${isDarkMode ? 'text-gray-200' : 'text-white'}`} />
             </div>
             <div>
-              <div className='text-sm text-gray-600'>Risk Level</div>
+              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Risk Level
+              </div>
               <div
                 className={`text-lg font-semibold capitalize ${
                   riskColor === 'green'
-                    ? 'text-green-600'
+                    ? isDarkMode
+                      ? 'text-green-400'
+                      : 'text-green-600'
                     : riskColor === 'yellow'
-                      ? 'text-amber-600'
+                      ? isDarkMode
+                        ? 'text-amber-400'
+                        : 'text-amber-600'
                       : riskColor === 'red'
-                        ? 'text-red-600'
-                        : 'text-gray-600'
+                        ? isDarkMode
+                          ? 'text-red-400'
+                          : 'text-red-600'
+                        : isDarkMode
+                          ? 'text-gray-400'
+                          : 'text-gray-600'
                 }`}
               >
                 {riskLevel}
@@ -164,26 +214,35 @@ export default function ResultCard({ result }: ResultCardProps) {
 
       {/* Findings Section */}
       {result.findings && result.findings.length > 0 && (
-        <div className='bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm'>
-          <h3 className='text-lg font-semibold text-gray-900 mb-4'>Analysis Findings</h3>
+        <div className='glass-card rounded-xl p-4'>
+          <h3
+            className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+          >
+            Analysis Findings
+          </h3>
           <div className='space-y-3'>
             {result.findings.map((finding, index) => (
-              <div key={index} className='flex items-start space-x-3 p-3 bg-gray-50 rounded-lg'>
+              <div
+                key={index}
+                className='flex items-start space-x-3 p-3 glass-morphism-dark rounded-lg'
+              >
                 <div
                   className={`
                   w-2 h-2 rounded-full mt-2 flex-shrink-0
                   ${
                     riskColor === 'green'
-                      ? 'bg-green-500'
+                      ? 'bg-green-400'
                       : riskColor === 'yellow'
-                        ? 'bg-amber-500'
+                        ? 'bg-amber-400'
                         : riskColor === 'red'
-                          ? 'bg-red-500'
-                          : 'bg-gray-500'
+                          ? 'bg-red-400'
+                          : 'bg-gray-400'
                   }
                 `}
                 />
-                <div className='text-sm text-gray-700'>{finding}</div>
+                <div className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-white/80'}`}>
+                  {finding}
+                </div>
               </div>
             ))}
           </div>

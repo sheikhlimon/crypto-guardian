@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Search, AlertCircle } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
+import { useTheme } from '../contexts/ThemeContext'
 import type { AddressCheckResponse } from '../types/api'
 
 interface AddressInputProps {
@@ -14,6 +15,7 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
+  const { isDarkMode } = useTheme()
 
   // Validate address
   const validateAddress = (value: string) => {
@@ -83,19 +85,19 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
       'w-full px-4 py-4 text-lg rounded-xl transition-all duration-200 focus:outline-none'
 
     if (error) {
-      return `${baseClasses} bg-white/60 border-2 border-red-300/60 text-red-900 backdrop-blur-sm focus:border-red-500 focus:ring-2 focus:ring-red-200`
+      return `${baseClasses} glass-input border-2 border-red-400 ${isDarkMode ? 'text-red-200' : 'text-red-900'} focus:border-red-500 focus:ring-2 focus:ring-red-200`
     }
 
     if (address && !error && touched) {
-      return `${baseClasses} bg-white/60 border-2 border-green-300/60 text-green-900 backdrop-blur-sm focus:border-green-500 focus:ring-2 focus:ring-green-200`
+      return `${baseClasses} glass-input border-2 border-green-400 ${isDarkMode ? 'text-green-200' : 'text-green-900'} focus:border-green-500 focus:ring-2 focus:ring-green-200`
     }
 
-    return `${baseClasses} bg-white/60 border-2 border-white/40 text-gray-900 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200`
+    return `${baseClasses} glass-input border-2 ${isDarkMode ? 'text-white border-white/40' : 'text-gray-900 border-white/40'} ${isDarkMode ? 'focus:border-blue-400' : 'focus:border-blue-500'} focus:ring-2 focus:ring-blue-200`
   }
 
   return (
     <div className='w-full'>
-      <div className='bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm'>
+      <div className={`glass-card rounded-xl p-6 ${isDarkMode ? 'border-white/10' : ''}`}>
         <form onSubmit={handleSubmit}>
           {/* Input container */}
           <div className='relative mb-4'>
@@ -116,14 +118,16 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
               {isLoading ? (
                 <div className='animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full' />
               ) : (
-                <Search className='h-5 w-5 text-gray-400' />
+                <Search className={`h-5 w-5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
               )}
             </div>
           </div>
 
           {/* Error message */}
           {error && (
-            <div className='mb-4 flex items-center space-x-2 text-red-600 text-sm'>
+            <div
+              className={`mb-4 flex items-center space-x-2 text-sm ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}
+            >
               <AlertCircle className='h-4 w-4 flex-shrink-0' />
               <span>{error}</span>
             </div>
@@ -134,9 +138,12 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
             type='submit'
             disabled={!address || !!error || isLoading}
             className={`
-            w-full px-6 py-3 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white
-            transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-            ${address && !error && !isLoading ? 'hover:shadow-lg hover:scale-[1.02]' : 'opacity-50 cursor-not-allowed'}
+            glass-button w-full px-6 py-3 text-lg font-semibold rounded-xl
+            ${
+              address && !error && !isLoading
+                ? `${isDarkMode ? 'text-white' : 'text-gray-900'} hover:shadow-lg`
+                : 'opacity-50 cursor-not-allowed'
+            }
           `}
           >
             {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
@@ -146,7 +153,9 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
       {/* Help text */}
       <div className='mt-4 text-center'>
-        <div className='inline-block text-sm text-gray-500 px-4 py-2 bg-gray-100 rounded-lg'>
+        <div
+          className={`inline-block text-sm px-4 py-2 glass-morphism-dark rounded-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}
+        >
           <p>Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains</p>
         </div>
       </div>
