@@ -46,12 +46,6 @@ function App() {
                 <Lock className='h-4 w-4' />
                 <span>Secure</span>
               </div>
-              <div
-                className={`flex items-center space-x-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}
-              >
-                <Sparkles className='h-4 w-4' />
-                <span>AI-Powered</span>
-              </div>
               <button
                 onClick={toggleDarkMode}
                 className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
