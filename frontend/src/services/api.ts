@@ -33,21 +33,14 @@ class APIClient {
 
   async checkAddress(address: string): Promise<AddressCheckResponse> {
     const requestBody: AddressCheckRequest = { address }
-    const response = await this.request<{ success: boolean; data: AddressCheckResponse }>(
-      '/check-address',
-      {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-      }
-    )
+    const response = await this.request<AddressCheckResponse>('/check-address', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+    })
 
-    // Backend returns { success: true, data: AddressCheckResponse }
-    // We need to extract the data field
-    if (response.success && response.data) {
-      return response.data
-    }
-
-    throw new Error('Invalid response format from API')
+    // Backend returns AddressCheckResponse directly
+    // Just return the response
+    return response
   }
 
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
