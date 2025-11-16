@@ -18,7 +18,7 @@
     "format": "pnpm -r format",
     "test": "pnpm -r test",
     "start": "pnpm --filter backend start",
-    "prepare": "husky",
+    "prepare": "husky || echo 'Husky not available in production'",
     "clean": "pnpm -r clean && rm -rf node_modules",
     "reinstall": "pnpm clean && pnpm install"
   },
