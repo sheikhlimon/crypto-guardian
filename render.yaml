@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: crypto-guardian-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: pnpm install && pnpm run build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
