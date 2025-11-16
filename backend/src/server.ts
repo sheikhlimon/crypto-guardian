@@ -8,11 +8,13 @@ const PORT = process.env.PORT || 3001
 // CORS middleware FIRST (before other middleware)
 app.use(corsHeaders)
 
+// JSON body parser BEFORE routes
+app.use(express.json({ limit: '10kb' }))
+
 // Security middleware
 app.use(rateLimiter)
 app.use(validateRequest)
 app.use(securityHeaders)
-app.use(express.json({ limit: '10kb' }))
 
 // API Routes
 app.use('/api', checkAddressRoutes)
