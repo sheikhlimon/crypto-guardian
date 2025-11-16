@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { checkAddress } from '../services/blockchair';
+import { checkAddress } from '../services/blockchair.js';
 
 const router = Router();
 
