@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express'
+import { Router, type Request, type Response, type Router as RouterType } from 'express'
 import { checkAddress } from '../services/blockchair'
 import { validateAddress } from '../utils/addressValidator'
 import type { AddressCheckResponse } from '../types'
 
-const router = Router()
+const router: RouterType = Router()
 
 // POST /api/check-address
 router.post('/check-address', async (req: Request, res: Response) => {

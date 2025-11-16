@@ -1,8 +1,8 @@
-import express from 'express'
+import express, { Express } from 'express'
 import checkAddressRoutes from './routes/checkAddress'
 import { corsHeaders, rateLimiter, validateRequest, securityHeaders } from './middleware/security'
 
-const app = express()
+const app: Express = express()
 const PORT = process.env.PORT || 3001
 
 // CORS middleware FIRST (before other middleware)
