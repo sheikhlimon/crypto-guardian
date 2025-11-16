@@ -1,10 +1,12 @@
-import { useState, FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
+import LiquidGlass from 'liquid-glass-react'
 import { Search, AlertCircle } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
+import type { AddressCheckResponse } from '../types/api'
 
 interface AddressInputProps {
-  onCheck: (result: any) => void
+  onCheck: (result: AddressCheckResponse) => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
 }
@@ -63,13 +65,13 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
     try {
       const result = await checkAddress(address)
-      
+
       if (result.success && result.data) {
         onCheck(result.data)
       } else {
         setError(result.error || 'Failed to check address')
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)
@@ -78,77 +80,92 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
   // Determine input state classes
   const getInputClasses = () => {
-    const baseClasses = 'w-full px-4 py-4 text-lg border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2'
-    
+    const baseClasses =
+      'w-full px-4 py-4 text-lg rounded-xl transition-all duration-200 focus:outline-none'
+
     if (error) {
-      return `${baseClasses} border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200`
+      return `${baseClasses} bg-white/60 border-2 border-red-300/60 text-red-900 backdrop-blur-sm`
     }
-    
+
     if (address && !error && touched) {
-      return `${baseClasses} border-green-300 bg-green-50 focus:border-green-500 focus:ring-green-200`
+      return `${baseClasses} bg-white/60 border-2 border-green-300/60 text-green-900 backdrop-blur-sm`
     }
-    
-    return `${baseClasses} border-gray-200 bg-white focus:border-blue-500 focus:ring-blue-200`
+
+    return `${baseClasses} bg-white/60 border-2 border-white/40 text-gray-900 backdrop-blur-sm`
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="relative">
-        {/* Input container */}
-        <div className="relative">
-          <input
-            type="text"
-            value={address}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            placeholder="Enter crypto address (0x..., 1..., bc1...)"
-            className={getInputClasses()}
-            disabled={isLoading}
-            autoComplete="off"
-            spellCheck={false}
-          />
+    <div className='w-full max-w-2xl mx-auto'>
+      <LiquidGlass mode='standard' blurAmount={0.0625} className='relative'>
+        <form onSubmit={handleSubmit} className='relative'>
+          {/* Input container */}
+          <div className='relative'>
+            <input
+              type='text'
+              value={address}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              placeholder='Enter crypto address (0x..., 1..., bc1...)'
+              className={getInputClasses()}
+              disabled={isLoading}
+              autoComplete='off'
+              spellCheck={false}
+            />
 
-          {/* Search icon */}
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-            {isLoading ? (
-              <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full" />
-            ) : (
-              <Search className="h-5 w-5 text-gray-400" />
-            )}
+            {/* Search icon */}
+            <div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
+              {isLoading ? (
+                <div className='animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full' />
+              ) : (
+                <Search className='h-5 w-5 text-gray-400' />
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Error message */}
-        {error && (
-          <div className="mt-2 flex items-center space-x-2 text-red-600 text-sm">
-            <AlertCircle className="h-4 w-4" />
-            <span>{error}</span>
-          </div>
-        )}
+          {/* Error message */}
+          {error && (
+            <div className='mt-2 flex items-center space-x-2 text-red-600 text-sm'>
+              <AlertCircle className='h-4 w-4' />
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Submit button */}
-        <button
-          type="submit"
-          disabled={!address || !!error || isLoading}
-          className={`
+          {/* Submit button */}
+          <LiquidGlass
+            mode='standard'
+            blurAmount={address && !error && !isLoading ? 0.0625 : 0.03125}
+            className={`
             w-full mt-4 px-6 py-4 text-lg font-semibold rounded-xl 
-            transition-all duration-200 focus:outline-none focus:ring-2
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${
-              address && !error && !isLoading
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-200 shadow-lg'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }
+            transition-all duration-300 focus:outline-none
+            ${address && !error && !isLoading ? 'hover:scale-105' : 'opacity-50'}
           `}
-        >
-          {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
-        </button>
-      </form>
+          >
+            <button
+              type='submit'
+              disabled={!address || !!error || isLoading}
+              className={`
+              w-full bg-transparent border-0 font-bold focus:outline-none
+              ${
+                address && !error && !isLoading
+                  ? 'gradient-text'
+                  : 'text-gray-400 cursor-not-allowed'
+              }
+            `}
+            >
+              {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
+            </button>
+          </LiquidGlass>
+        </form>
+      </LiquidGlass>
 
       {/* Help text */}
-      <div className="mt-6 text-center text-sm text-gray-500">
+      <LiquidGlass
+        mode='standard'
+        blurAmount={0.03125}
+        className='mt-6 text-center text-sm text-gray-500 p-4 rounded-lg'
+      >
         <p>Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains</p>
-      </div>
+      </LiquidGlass>
     </div>
   )
 }

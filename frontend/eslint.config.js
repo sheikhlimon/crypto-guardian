@@ -4,11 +4,11 @@ import typescriptParser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
-import prettier from 'eslint-config-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
-  prettier,
+  prettierConfig,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
@@ -25,6 +25,12 @@ export default [
         document: 'readonly',
         window: 'readonly',
         process: 'readonly',
+        React: 'readonly',
+        HTMLInputElement: 'readonly',
+        RequestInit: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
       },
     },
     plugins: {
@@ -34,10 +40,10 @@ export default [
       'jsx-a11y': jsxA11y,
     },
     rules: {
-      ...typescript.configs.recommended.rules,
-      ...react.configs.flat.recommended.rules,
-      ...reactHooks.configs.flat.recommended.rules,
-      ...jsxA11y.configs.flat.recommended.rules,
+      ...typescript.configs?.recommended?.rules || {},
+      ...react.configs?.flat?.recommended?.rules || {},
+      ...reactHooks.configs?.flat?.recommended?.rules || {},
+      ...jsxA11y.configs?.flat?.recommended?.rules || {},
 
       // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

@@ -1,15 +1,14 @@
 // Simple utility functions for junior developers
 
 // Validation helpers
-export const validateEmail = (email: string): boolean => 
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+export const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
 export const validateCryptoAddress = (address: string): boolean => {
   // Basic validation for common crypto address formats
   const ethPattern = /^0x[a-fA-F0-9]{40}$/
   const btcPattern = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/
   const btcBech32 = /^bc1[a-z0-9]{8,87}$/
-  
+
   return ethPattern.test(address) || btcPattern.test(address) || btcBech32.test(address)
 }
 
@@ -24,12 +23,12 @@ export const safeAsync = async <T>(fn: () => Promise<T>): Promise<[Error | null,
 }
 
 // Simple debounce for API calls
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout
-  
+  let timeout: ReturnType<typeof setTimeout>
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), wait)
@@ -75,16 +74,16 @@ export const handleApiResponse = async <T>(
   promise: Promise<T>
 ): Promise<{ success: boolean; data?: T; error?: string }> => {
   const [error, result] = await safeAsync(() => promise)
-  
+
   if (error) {
     return {
       success: false,
-      error: error.message
+      error: error.message,
     }
   }
-  
+
   return {
     success: true,
-    data: result
+    data: result ?? undefined,
   }
 }
