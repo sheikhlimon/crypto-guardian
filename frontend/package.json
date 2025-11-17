@@ -23,7 +23,7 @@
     ]
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
