@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { setTimeout } from 'timers'
+import { convertToUSD } from './priceAPI'
 import type { BlockchainType } from '../types'
 
 // Common interface for all API providers
@@ -229,17 +230,39 @@ export const getAddressData = async (
   }
 
   // Try each provider until one succeeds
+  let result: AddressData | null = null
   for (const provider of providers) {
     try {
-      const result = await provider()
-      if (result && (result.balance !== undefined || result.transaction_count !== undefined)) {
-        return result
+      const providerResult = await provider()
+      if (
+        providerResult &&
+        (providerResult.balance !== undefined || providerResult.transaction_count !== undefined)
+      ) {
+        result = providerResult
+        break
       }
     } catch {
       console.error('Provider failed, trying next...')
     }
   }
 
-  // Final fallback
-  return localAnalysis(address, blockchain)
+  // If no provider succeeded, use fallback
+  if (!result) {
+    result = localAnalysis(address, blockchain)
+  }
+
+  // Calculate USD value if balance is available
+  if (result.balance) {
+    try {
+      const usdValue = await convertToUSD(result.balance, blockchain)
+      result.total_value = usdValue
+    } catch (error) {
+      console.error('Error calculating USD value:', error)
+      result.total_value = '0'
+    }
+  } else {
+    result.total_value = '0'
+  }
+
+  return result
 }

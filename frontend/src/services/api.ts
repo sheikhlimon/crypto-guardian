@@ -33,14 +33,17 @@ class APIClient {
 
   async checkAddress(address: string): Promise<AddressCheckResponse> {
     const requestBody: AddressCheckRequest = { address }
-    const response = await this.request<AddressCheckResponse>('/check-address', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-    })
+    const response = await this.request<{ success: boolean; data: AddressCheckResponse }>(
+      '/check-address',
+      {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      }
+    )
 
-    // Backend returns AddressCheckResponse directly
-    // Just return the response
-    return response
+    // Backend returns wrapped response with success and data
+    // Return the unwrapped data
+    return response.data
   }
 
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
@@ -66,7 +69,15 @@ const apiClient = new APIClient(API_BASE_URL)
 
 // Export simple API functions
 export const checkAddress = async (address: string) => {
-  return handleApiResponse(apiClient.checkAddress(address))
+  try {
+    const data = await apiClient.checkAddress(address)
+    return { success: true, data }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
 }
 
 export const healthCheck = async () => {

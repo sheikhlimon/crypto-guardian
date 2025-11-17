@@ -1,6 +1,7 @@
 import express, { Express } from 'express'
 import checkAddressRoutes from './routes/checkAddress'
 import { corsHeaders, rateLimiter, validateRequest, securityHeaders } from './middleware/security'
+import { initializePriceCache } from './services/priceAPI'
 
 const app: Express = express()
 const PORT = process.env.PORT || 3001
@@ -56,10 +57,18 @@ app.use((err: unknown, req: express.Request, res: express.Response) => {
 })
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.error('🚀 Crypto Guardian API server running on port', PORT)
   console.error('📊 Health check: http://localhost:', `${PORT}/health`)
   console.error('🔍 API endpoint: http://localhost:', `${PORT}/api/check-address`)
+
+  // Initialize price cache
+  try {
+    await initializePriceCache()
+    console.error('💰 Price cache initialized successfully')
+  } catch (error) {
+    console.error('⚠️ Failed to initialize price cache:', error)
+  }
 })
 
 export default app
