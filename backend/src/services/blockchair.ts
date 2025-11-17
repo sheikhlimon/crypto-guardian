@@ -56,10 +56,14 @@ export const checkAddress = async (address: string) => {
     const blockchain = validation.blockchain
 
     // Get address info
-    const addressData = (await getAddressInfo(normalizedAddress, blockchain)) as {
+    const addressData = ((await getAddressInfo(normalizedAddress, blockchain)) as {
       transaction_count?: number
       balance?: string
       total_value?: string
+    }) || {
+      transaction_count: 0,
+      balance: '0',
+      total_value: '0',
     }
 
     // Get transactions
