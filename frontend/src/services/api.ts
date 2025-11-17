@@ -14,14 +14,16 @@ class APIClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}/api${endpoint}`
 
+    // Only add targetAddressSpace for development/local environments
+    const isDevelopment = import.meta.env.DEV || this.baseURL.includes('localhost')
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       ...options,
-      // Allow local network requests for development
-      targetAddressSpace: 'private',
+      ...(isDevelopment ? { targetAddressSpace: 'private' } : {}),
     } as RequestInit)
 
     const data = await response.json()
@@ -50,12 +52,15 @@ class APIClient {
 
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     const url = `${this.baseURL}/health`
+
+    // Only add targetAddressSpace for development/local environments
+    const isDevelopment = import.meta.env.DEV || this.baseURL.includes('localhost')
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
       },
-      // Allow local network requests for development
-      targetAddressSpace: 'private',
+      ...(isDevelopment ? { targetAddressSpace: 'private' } : {}),
     } as RequestInit)
 
     const data = await response.json()
