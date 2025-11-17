@@ -73,12 +73,12 @@ export const convertToUSD = async (
 
     if (blockchain === 'bitcoin') {
       // Convert from satoshis (8 decimal places) to BTC
-      const satoshis = parseFloat(balance) || 0
-      standardBalance = (satoshis / 100000000).toString()
+      const satoshis = BigInt(balance) || 0n
+      standardBalance = (Number(satoshis) / 100000000).toString()
     } else {
       // Convert from wei (18 decimal places) to ETH/other EVM tokens
-      const wei = parseFloat(balance) || 0
-      standardBalance = (wei / 1e18).toString()
+      const wei = BigInt(balance) || 0n
+      standardBalance = (Number(wei) / 1e18).toString()
     }
 
     // Calculate USD value

@@ -59,6 +59,7 @@ export const checkAddress = async (address: string) => {
     const addressData = (await getAddressInfo(normalizedAddress, blockchain)) as {
       transaction_count?: number
       balance?: string
+      total_value?: string
     }
 
     // Get transactions
@@ -75,10 +76,12 @@ export const checkAddress = async (address: string) => {
     )
 
     // Update analysis with address and blockchain info
+    // Ensure we use the calculated USD value from blockchainApis, not the default from riskAnalyzer
     return {
       ...analysis,
       address: normalizedAddress,
       blockchain,
+      total_value: addressData?.total_value || analysis.total_value,
     }
   } catch (error: unknown) {
     console.error('Error checking address:', {
