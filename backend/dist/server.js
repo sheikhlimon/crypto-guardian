@@ -278,7 +278,7 @@ var initializePriceCache = async () => {
     )
   )
   await Promise.allSettled(promises)
-  console.log('Price cache initialized')
+  console.error('Price cache initialized')
 }
 
 // src/services/blockchainApis.ts
