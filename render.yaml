@@ -4,12 +4,15 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: pnpm install && pnpm run build
-    startCommand: pnpm start
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    nodeVersion: 18
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3001
       - key: ETHERSCAN_API_KEY
+        sync: false
+      - key: BLOCKCHAIR_API_KEY
         sync: false
