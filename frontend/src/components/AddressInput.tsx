@@ -136,16 +136,7 @@ export default function AddressInput({
 
             {/* Error message */}
             {error && (
-              <div className='mb-4 space-y-2'>
-                <div className='flex items-center justify-center'>
-                  <div className='inline-flex items-center space-x-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg glass-effect relative overflow-hidden group'>
-                    <div className='absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity'></div>
-                    <AlertCircle className='h-4 w-4 text-red-400 relative z-10' />
-                    <span className='text-sm font-medium text-red-400 relative z-10'>
-                      Analysis Failed
-                    </span>
-                  </div>
-                </div>
+              <div className='mb-4'>
                 <Alert variant='destructive' className='relative overflow-hidden'>
                   <div className='absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 to-red-600'></div>
                   <AlertCircle className='h-4 w-4' />
