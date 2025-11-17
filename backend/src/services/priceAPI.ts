@@ -111,5 +111,5 @@ export const initializePriceCache = async () => {
   )
 
   await Promise.allSettled(promises)
-  console.log('Price cache initialized')
+  console.error('Price cache initialized')
 }
