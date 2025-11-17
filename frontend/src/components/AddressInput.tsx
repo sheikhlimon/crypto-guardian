@@ -4,7 +4,6 @@ import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Alert, AlertDescription } from './ui/alert'
 import { Card, CardContent } from './ui/card'
 import type { AddressCheckResponse } from '../types/api'
 
@@ -137,11 +136,23 @@ export default function AddressInput({
             {/* Error message */}
             {error && (
               <div className='mb-4'>
-                <Alert variant='destructive' className='relative overflow-hidden'>
-                  <div className='absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 to-red-600'></div>
-                  <AlertCircle className='h-4 w-4' />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <Card className='glass-effect border-red-500/20 bg-red-500/5 relative overflow-hidden group'>
+                  <div className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-500/5 to-transparent rounded-bl-full'></div>
+                  <CardContent className='p-4 relative z-10'>
+                    <div className='flex items-start space-x-3'>
+                      <div className='flex-shrink-0 mt-0.5'>
+                        <div className='glass-effect w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 relative group'>
+                          <div className='absolute inset-0 bg-gradient-to-br from-red-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'></div>
+                          <AlertCircle className='h-4 w-4 text-red-400 relative z-10' />
+                        </div>
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <p className='text-sm font-medium text-red-400 mb-1'>Validation Error</p>
+                        <p className='text-sm text-muted-foreground leading-relaxed'>{error}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 
