@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Search, AlertCircle } from 'lucide-react'
+import { Search, AlertCircle, Shield } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
 import { Button } from './ui/button'
@@ -160,12 +160,21 @@ export default function AddressInput({
             <Button
               type='submit'
               disabled={!address || !!error || isLoading}
-              className='w-full h-12 text-base font-semibold transition-all hover:shadow-lg relative overflow-hidden group'
+              className='w-full h-13 text-base font-semibold transition-all duration-200 relative overflow-hidden group bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/95 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-primary/20'
             >
-              <div className='absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 transform translate-x-full group-hover:translate-x-0 transition-transform'></div>
-              <span className='relative z-10'>
-                {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
-              </span>
+              <div className='relative z-10 flex items-center justify-center space-x-2'>
+                {isLoading ? (
+                  <>
+                    <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin'></div>
+                    <span>Checking Address...</span>
+                  </>
+                ) : (
+                  <>
+                    <Shield className='w-4 h-4' />
+                    <span>Check Wallet Safety</span>
+                  </>
+                )}
+              </div>
             </Button>
           </form>
         </CardContent>

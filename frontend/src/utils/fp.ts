@@ -58,15 +58,50 @@ export const getRiskColor = (verdict: string): string => {
   switch (verdict.toLowerCase()) {
     case 'clean':
     case 'safe':
-      return 'green'
+      return 'emerald'
     case 'suspicious':
-      return 'yellow'
+      return 'amber'
     case 'malicious':
     case 'dangerous':
-      return 'red'
+      return 'rose'
     default:
-      return 'gray'
+      return 'slate'
   }
+}
+
+// Get risk score color based on numeric value (0-100)
+export const getRiskScoreColor = (score: number): string => {
+  if (score <= 30) return 'emerald'
+  if (score <= 60) return 'amber'
+  return 'rose'
+}
+
+// Get risk score gradient classes
+export const getRiskScoreGradient = (score: number): string => {
+  if (score <= 30) return 'from-emerald-500 to-emerald-600'
+  if (score <= 60) return 'from-amber-500 to-amber-600'
+  return 'from-rose-500 to-rose-600'
+}
+
+// Get risk score text color
+export const getRiskScoreTextColor = (score: number): string => {
+  if (score <= 30) return 'text-emerald-600'
+  if (score <= 60) return 'text-amber-600'
+  return 'text-rose-600'
+}
+
+// Get risk score background color
+export const getRiskScoreBgColor = (score: number): string => {
+  if (score <= 30) return 'bg-emerald-50 dark:bg-emerald-950'
+  if (score <= 60) return 'bg-amber-50 dark:bg-amber-950'
+  return 'bg-rose-50 dark:bg-rose-950'
+}
+
+// Get risk score ring color
+export const getRiskScoreRingColor = (score: number): string => {
+  if (score <= 30) return 'stroke-emerald-500'
+  if (score <= 60) return 'stroke-amber-500'
+  return 'stroke-rose-500'
 }
 
 // Simple API response helper
