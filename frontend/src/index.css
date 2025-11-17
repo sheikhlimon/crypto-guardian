@@ -105,22 +105,6 @@
       0 4px 6px -1px rgba(0, 0, 0, 0.05),
       0 2px 4px -1px rgba(0, 0, 0, 0.03);
     position: relative;
-    overflow: hidden;
-  }
-
-  .glass-effect::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-  }
-
-  .glass-effect:hover::before {
-    left: 100%;
   }
 
   .dark .glass-effect {
@@ -129,10 +113,6 @@
     box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.3),
       0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  }
-
-  .dark .glass-effect::before {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
   }
 
   .neon-glow {

@@ -5,7 +5,6 @@ import {
   getRiskColor,
   getRiskScoreColor,
   getRiskScoreGradient,
-  getRiskScoreTextColor,
   getRiskScoreBgColor,
   getRiskScoreRingColor,
 } from '../utils/fp'
@@ -23,7 +22,6 @@ export default function ResultCard({ result }: ResultCardProps) {
   const riskScore = result?.risk_score || 0
   const riskScoreColor = getRiskScoreColor(riskScore)
   const riskScoreGradient = getRiskScoreGradient(riskScore)
-  const riskScoreTextColor = getRiskScoreTextColor(riskScore)
   const riskScoreBgColor = getRiskScoreBgColor(riskScore)
   const riskScoreRingColor = getRiskScoreRingColor(riskScore)
 
@@ -104,33 +102,41 @@ export default function ResultCard({ result }: ResultCardProps) {
               <div
                 className={`absolute inset-0 bg-gradient-to-r ${riskScoreGradient} opacity-10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity`}
               ></div>
-              <div className='relative'>
-                <svg className='w-16 h-16 mx-auto transform -rotate-90'>
-                  <circle
-                    cx='32'
-                    cy='32'
-                    r='28'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                    fill='none'
-                    className='text-gray-200 dark:text-gray-700'
-                  />
-                  <circle
-                    cx='32'
-                    cy='32'
-                    r='28'
-                    strokeWidth='4'
-                    fill='none'
-                    strokeLinecap='round'
-                    className={`${riskScoreRingColor} transition-all duration-500`}
-                    strokeDasharray={`${(riskScore / 100) * 176} 176`}
-                  />
+              <div className='w-16 h-16 mx-auto relative'>
+                <svg className='absolute inset-0 w-full h-full' viewBox='0 0 64 64'>
+                  <g transform='rotate(-90 32 32)'>
+                    <circle
+                      cx='32'
+                      cy='32'
+                      r='28'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                      fill='none'
+                      className='text-gray-200 dark:text-gray-700'
+                    />
+                    <circle
+                      cx='32'
+                      cy='32'
+                      r='28'
+                      strokeWidth='4'
+                      fill='none'
+                      strokeLinecap='round'
+                      className={`${riskScoreRingColor} transition-all duration-500`}
+                      strokeDasharray={`${(riskScore / 100) * 176} 176`}
+                    />
+                  </g>
+                  <text
+                    x='32'
+                    y='32'
+                    textAnchor='middle'
+                    dominantBaseline='middle'
+                    fontSize='24'
+                    fontWeight='bold'
+                    fill={riskScore <= 30 ? '#059669' : riskScore <= 60 ? '#d97706' : '#e11d48'}
+                  >
+                    {riskScore}
+                  </text>
                 </svg>
-                <div
-                  className={`absolute inset-0 flex items-center justify-center text-2xl font-bold ${riskScoreTextColor}`}
-                >
-                  {riskScore}
-                </div>
               </div>
               <div className='text-sm text-muted-foreground relative z-10 font-medium mt-2'>
                 Risk Score
