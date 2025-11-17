@@ -66,6 +66,21 @@ export default function ResultCard({ result }: ResultCardProps) {
 
   return (
     <div className='w-full space-y-6'>
+      {/* Success Notification */}
+      <div className='flex items-center justify-center mb-4'>
+        <div className='inline-flex items-center space-x-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-lg glass-effect relative overflow-hidden group'>
+          <div className='absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity'></div>
+          <div className='w-2 h-2 bg-green-400 rounded-full animate-pulse relative z-10'></div>
+          <span className='text-sm font-medium text-green-400 relative z-10'>
+            Analysis Complete
+          </span>
+          <div
+            className='w-2 h-2 bg-green-400 rounded-full animate-pulse relative z-10'
+            style={{ animationDelay: '0.5s' }}
+          ></div>
+        </div>
+      </div>
+
       {/* Main Result Card */}
       <Card className='glass-effect relative overflow-hidden'>
         <div className='absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary/8 to-transparent rounded-bl-full'></div>
