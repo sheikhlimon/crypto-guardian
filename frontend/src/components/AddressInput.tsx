@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { Search, AlertCircle } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
-import { useTheme } from '../contexts/ThemeContext'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Alert, AlertDescription } from './ui/alert'
@@ -19,7 +18,6 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
-  const { isDarkMode } = useTheme()
 
   // Validate address
   const validateAddress = (value: string) => {
@@ -85,8 +83,8 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
   return (
     <div className='w-full'>
-      <Card className="glass-effect relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+      <Card className='glass-effect relative overflow-hidden'>
+        <div className='absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full'></div>
         <CardContent className='p-6 relative z-10'>
           <form onSubmit={handleSubmit}>
             {/* Input container */}
@@ -98,9 +96,11 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
                 onBlur={handleBlur}
                 placeholder='Enter crypto address (0x..., 1..., bc1...)'
                 className={`text-base h-12 pr-12 transition-all ${
-                  error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : 
-                  address && !error && touched ? "border-green-500 focus:border-green-500 focus:ring-green-500/20" : 
-                  "focus:ring-primary/20"
+                  error
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : address && !error && touched
+                      ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                      : 'focus:ring-primary/20'
                 }`}
                 disabled={isLoading}
                 autoComplete='off'
@@ -112,7 +112,10 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
                 {isLoading ? (
                   <div className='relative'>
                     <div className='animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full'></div>
-                    <div className='absolute inset-0 h-5 w-5 border-2 border-primary/20 border-t-transparent rounded-full animate-spin' style={{ animationDelay: '0.1s' }}></div>
+                    <div
+                      className='absolute inset-0 h-5 w-5 border-2 border-primary/20 border-t-transparent rounded-full animate-spin'
+                      style={{ animationDelay: '0.1s' }}
+                    ></div>
                   </div>
                 ) : (
                   <Search className='h-5 w-5 text-muted-foreground' />
@@ -122,8 +125,8 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
             {/* Error message */}
             {error && (
-              <Alert variant="destructive" className='mb-4 relative overflow-hidden'>
-                <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 to-red-600"></div>
+              <Alert variant='destructive' className='mb-4 relative overflow-hidden'>
+                <div className='absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 to-red-600'></div>
                 <AlertCircle className='h-4 w-4' />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -135,8 +138,10 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
               disabled={!address || !!error || isLoading}
               className='w-full h-12 text-base font-semibold transition-all hover:shadow-lg relative overflow-hidden group'
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 transform translate-x-full group-hover:translate-x-0 transition-transform"></div>
-              <span className="relative z-10">{isLoading ? 'Checking Address...' : 'Check Wallet Safety'}</span>
+              <div className='absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 transform translate-x-full group-hover:translate-x-0 transition-transform'></div>
+              <span className='relative z-10'>
+                {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
+              </span>
             </Button>
           </form>
         </CardContent>
@@ -144,8 +149,8 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
       {/* Help text */}
       <div className='mt-4 text-center'>
-        <Card className="glass-effect inline-block relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50"></div>
+        <Card className='glass-effect inline-block relative overflow-hidden'>
+          <div className='absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50'></div>
           <CardContent className='px-6 py-3 relative z-10'>
             <div className='flex items-center space-x-2'>
               <div className='w-1.5 h-1.5 bg-primary rounded-full'></div>

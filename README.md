@@ -2,6 +2,8 @@
 
 Crypto fraud detection app that analyzes wallet addresses for suspicious patterns and known scams.
 
+⚠️ **Note**: Backend may take 10-30s on first request (Render free tier sleep mode).
+
 ## Quick Start
 
 ```bash
@@ -10,19 +12,14 @@ pnpm dev
 ```
 
 Access at:
+
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3001
-
-## Live Demo
-
-- **Frontend**: https://crypto-guardian-frontend.vercel.app
-- **Backend**: https://crypto-guardian-api.onrender.com
-
-⚠️ **Note**: Backend may take 10-30s on first request (Render free tier sleep mode).
 
 ## Setup
 
 1. Copy environment files:
+
    ```bash
    cp backend/.env.example backend/.env
    cp frontend/.env.example frontend/.env
@@ -41,22 +38,32 @@ Access at:
 
 ## Features
 
+### Security & Detection
+
 - Multi-chain support (Ethereum, Bitcoin, BSC, Polygon, Arbitrum)
 - Suspicious pattern detection
 - Real-time address validation
-- Modern responsive UI
-- TypeScript throughout
+- Risk scoring system
+- Transaction analysis
+
+### Technical Stack
+
+- **Frontend**: React + TypeScript + shadcn/ui + Tailwind CSS
+- **Backend**: Node.js + Express
+- **API Integration**: Etherscan and Blockchair APIs
 
 ## API
 
 ### POST /api/check-address
 
 **Request:**
+
 ```json
 { "address": "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Db45" }
 ```
 
 **Response:**
+
 ```json
 {
   "verdict": "CLEAN",
@@ -67,27 +74,6 @@ Access at:
   "recommendation": "Address appears to be safe"
 }
 ```
-
-## Environment Variables
-
-See `.env.example` files:
-- `backend/.env.example` - Server config and API keys
-- `frontend/.env.example` - API endpoint URLs
-
-## Scripts
-
-```bash
-pnpm build        # Build for production
-pnpm lint         # Run linting
-pnpm format       # Format code
-```
-
-## Contributing
-
-1. Fork
-2. Create feature branch
-3. Make changes & run `pnpm lint`
-4. Submit PR
 
 ## License
 
