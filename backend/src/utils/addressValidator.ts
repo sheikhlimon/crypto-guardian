@@ -1,7 +1,7 @@
 import type { AddressValidationResult, BlockchainType } from '../types'
 
 // Ethereum address patterns
-const ETHEREUM_PATTERN = /^0x[a-fA-F0-9]{40}$/
+const ETHEREUM_PATTERN = /^0x[a-fA-F0-9]{40}$/i
 
 // Bitcoin address patterns
 const BITCOIN_LEGACY = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/
@@ -9,13 +9,13 @@ const BITCOIN_SEGWIT = /^[bc1][a-hj-mnp-zAC-HJ-NP-Z0-9]{39,59}$/
 const BITCOIN_TAPROOT = /^bc1p[ac-hj-np-z02-9]{58}$/
 
 // BSC address pattern (same as Ethereum)
-const BSC_PATTERN = /^0x[a-fA-F0-9]{40}$/
+const BSC_PATTERN = /^0x[a-fA-F0-9]{40}$/i
 
 // Polygon address pattern (same as Ethereum)
-const POLYGON_PATTERN = /^0x[a-fA-F0-9]{40}$/
+const POLYGON_PATTERN = /^0x[a-fA-F0-9]{40}$/i
 
 // Arbitrum address pattern (same as Ethereum)
-const ARBITRUM_PATTERN = /^0x[a-fA-F0-9]{40}$/
+const ARBITRUM_PATTERN = /^0x[a-fA-F0-9]{40}$/i
 
 export const validateAddress = (address: string): AddressValidationResult => {
   const trimmedAddress = address.trim()
