@@ -30,7 +30,7 @@ const rateLimit = (provider: string) => {
   return Promise.resolve()
 }
 
-// 1. Blockchain.com API (Free, generous limits)
+// 1. Blockchain.com API (Free, generous limits) - Now also supports ETH via Etherscan
 export const blockchainInfoAPI = async (
   address: string,
   blockchain: BlockchainType
@@ -38,22 +38,42 @@ export const blockchainInfoAPI = async (
   await rateLimit('blockchain')
 
   try {
-    // Blockchain.com only supports Bitcoin
-    if (blockchain !== 'bitcoin') return null
+    if (blockchain === 'bitcoin') {
+      const response = await axios.get(`https://blockchain.info/q/address/${address}?format=json`, {
+        timeout: 10000,
+        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+      })
 
-    const response = await axios.get(`https://blockchain.info/q/address/${address}?format=json`, {
-      timeout: 10000,
-      headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
-    })
+      const data = response.data
+      return {
+        address,
+        balance: data.final_balance?.toString() || '0',
+        transaction_count: data.n_tx || 0,
+      }
+    } else if (blockchain === 'ethereum') {
+      // Use a simple ETH balance API that doesn't require API key
+      const response = await axios.get(
+        `https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`,
+        {
+          timeout: 10000,
+          headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+        }
+      )
 
-    const data = response.data
-    return {
-      address,
-      balance: data.final_balance?.toString() || '0',
-      transaction_count: data.n_tx || 0,
+      const data = response.data
+      return {
+        address,
+        balance: data.ETH?.balance || '0',
+        transaction_count: data.ETH?.txCount || 0,
+      }
     }
-  } catch {
-    console.error('Blockchain.com API error')
+
+    return null
+  } catch (error) {
+    console.error(
+      'Blockchain.com API error:',
+      error instanceof Error ? error.message : 'Unknown error'
+    )
     return null
   }
 }
@@ -93,7 +113,10 @@ export const etherscanAPI = async (
             apikey: key || 'YourApiKeyToken',
           },
           timeout: 10000,
-          headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+          headers: {
+            'User-Agent': 'Crypto-Guardian/1.0',
+            Accept: 'application/json',
+          },
         })
 
         if (response.data.status === '1') {
