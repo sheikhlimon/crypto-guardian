@@ -33,7 +33,10 @@ app.get('/health', (req, res) => {
 
 // Debug endpoint to test API connectivity
 app.get('/debug/api-connectivity', async (req, res) => {
-  const results = {
+  const results: {
+    coingecko: { status: string | number; response: string | null }
+    coinmarketcap: { status: string | number; response: string | null }
+  } = {
     coingecko: { status: 'unknown', response: null },
     coinmarketcap: { status: 'unknown', response: null },
   }

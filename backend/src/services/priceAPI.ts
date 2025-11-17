@@ -85,7 +85,7 @@ export const getCurrentPrice = async (blockchain: BlockchainType): Promise<numbe
   }
 
   // If all APIs fail, cache and return 0 to trigger fallback prices
-  priceCache.set(cacheKey, 0, { ttl: 60 }) // Cache for 1 minute only
+  priceCache.set(cacheKey, 0, 60) // Cache for 1 minute only
   return 0
 }
 
