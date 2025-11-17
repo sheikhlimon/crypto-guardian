@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "tsc",
+    "build": "tsup",
     "build:only": "tsc",
     "type-check": "tsc --noEmit",
     "start": "node dist/server.js",
@@ -28,21 +28,22 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@types/express": "^5.0.5",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "node-cache": "^5.1.2",
-    "tsx": "^4.20.6",
-    "@types/express": "^5.0.5"
+    "tsx": "^4.20.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
+    "esbuild": "^0.24.0",
     "nodemon": "^3.1.11",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsup": "^8.5.1"
   }
 }
