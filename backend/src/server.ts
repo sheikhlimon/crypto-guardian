@@ -2,6 +2,7 @@ import express, { Express } from 'express'
 import checkAddressRoutes from './routes/checkAddress'
 import { corsHeaders, rateLimiter, validateRequest, securityHeaders } from './middleware/security'
 import { initializePriceCache } from './services/priceAPI'
+import axios from 'axios'
 
 const app: Express = express()
 const PORT = process.env.PORT || 3001
@@ -27,6 +28,48 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
+  })
+})
+
+// Debug endpoint to test API connectivity
+app.get('/debug/api-connectivity', async (req, res) => {
+  const results = {
+    coingecko: { status: 'unknown', response: null },
+    coinmarketcap: { status: 'unknown', response: null },
+  }
+
+  // Test CoinGecko
+  try {
+    const response = await axios.get(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+      {
+        timeout: 5000,
+        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+      }
+    )
+    results.coingecko.status = response.status
+    results.coingecko.response = JSON.stringify(response.data)
+  } catch (error) {
+    results.coingecko.status = 'error'
+    results.coingecko.response = error instanceof Error ? error.message : 'Unknown error'
+  }
+
+  // Test CoinMarketCap
+  try {
+    const response = await axios.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/', {
+      timeout: 5000,
+      headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+    })
+    results.coinmarketcap.status = response.status
+    results.coinmarketcap.response = JSON.stringify(response.data)
+  } catch (error) {
+    results.coinmarketcap.status = 'error'
+    results.coinmarketcap.response = error instanceof Error ? error.message : 'Unknown error'
+  }
+
+  res.status(200).json({
+    timestamp: new Date().toISOString(),
+    results,
   })
 })
 
