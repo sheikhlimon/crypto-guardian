@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Crypto fraud detection web app",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.0.0",
   "workspaces": [
     "frontend",
     "backend"
