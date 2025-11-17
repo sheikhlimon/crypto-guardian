@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AddressInput from './components/AddressInput'
 import ResultCard from './components/ResultCard'
 import { Shield, Sparkles, Lock, Sun, Moon } from 'lucide-react'
@@ -10,7 +10,18 @@ import type { AddressCheckResponse } from './types/api'
 function App() {
   const [result, setResult] = useState<AddressCheckResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [analysisComplete, setAnalysisComplete] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const { isDarkMode, toggleDarkMode } = useTheme()
+
+  useEffect(() => {
+    // Simulate initialization delay for cold start effect
+    const timer = setTimeout(() => {
+      setHasLoaded(true)
+    }, 1500)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div className={`min-h-screen bg-background ${isDarkMode ? '' : 'shield-pattern'}`}>
@@ -81,8 +92,33 @@ function App() {
         <div className='text-center mb-8'>
           <div className='inline-flex items-center justify-center p-1 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 mb-6'>
             <div className='flex items-center space-x-2 px-4 py-2 rounded-full glass-effect'>
-              <div className='w-2 h-2 bg-green-400 rounded-full animate-pulse'></div>
-              <span className='text-xs font-medium text-muted-foreground'>SYSTEM ONLINE</span>
+              <div
+                className={`w-2 h-2 ${analysisComplete ? 'bg-emerald-400' : 'bg-cyan-400'} ${hasLoaded && !analysisComplete ? 'animate-pulse' : ''} rounded-full`}
+              ></div>
+              <span className='text-xs font-medium text-muted-foreground'>
+                {hasLoaded ? (
+                  analysisComplete ? (
+                    'ANALYSIS COMPLETE'
+                  ) : (
+                    'SYSTEM READY'
+                  )
+                ) : (
+                  <span className='flex items-center space-x-1'>
+                    <span>INITIALIZING</span>
+                    <div className='flex space-x-0.5'>
+                      <div className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'></div>
+                      <div
+                        className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'
+                        style={{ animationDelay: '0.2s' }}
+                      ></div>
+                      <div
+                        className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'
+                        style={{ animationDelay: '0.4s' }}
+                      ></div>
+                    </div>
+                  </span>
+                )}
+              </span>
             </div>
           </div>
 
@@ -106,7 +142,12 @@ function App() {
 
         {/* Address Input Section */}
         <div className='mb-8'>
-          <AddressInput onCheck={setResult} isLoading={isLoading} setIsLoading={setIsLoading} />
+          <AddressInput
+            onCheck={setResult}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            setAnalysisComplete={setAnalysisComplete}
+          />
         </div>
 
         {/* Results Section */}

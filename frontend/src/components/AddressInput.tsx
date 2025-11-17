@@ -12,9 +12,15 @@ interface AddressInputProps {
   onCheck: (result: AddressCheckResponse) => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
+  setAnalysisComplete: (complete: boolean) => void
 }
 
-export default function AddressInput({ onCheck, isLoading, setIsLoading }: AddressInputProps) {
+export default function AddressInput({
+  onCheck,
+  isLoading,
+  setIsLoading,
+  setAnalysisComplete,
+}: AddressInputProps) {
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
@@ -71,11 +77,14 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
 
       if (result.success && result.data) {
         onCheck(result.data)
+        setAnalysisComplete(true)
       } else {
         setError(result.error || 'Failed to check address')
+        setAnalysisComplete(false)
       }
     } catch {
       setError('Something went wrong. Please try again.')
+      setAnalysisComplete(false)
     } finally {
       setIsLoading(false)
     }
