@@ -91,6 +91,8 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
             <div className='relative mb-4'>
               <Input
                 type='text'
+                id='crypto-address'
+                name='crypto-address'
                 value={address}
                 onChange={handleInputChange}
                 onBlur={handleBlur}

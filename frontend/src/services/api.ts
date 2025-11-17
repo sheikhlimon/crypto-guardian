@@ -20,7 +20,9 @@ class APIClient {
         ...options.headers,
       },
       ...options,
-    })
+      // Allow local network requests for development
+      targetAddressSpace: 'private',
+    } as RequestInit)
 
     const data = await response.json()
 
@@ -52,7 +54,9 @@ class APIClient {
       headers: {
         'Content-Type': 'application/json',
       },
-    })
+      // Allow local network requests for development
+      targetAddressSpace: 'private',
+    } as RequestInit)
 
     const data = await response.json()
 
