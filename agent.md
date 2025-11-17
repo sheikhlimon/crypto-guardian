@@ -7,12 +7,13 @@
 - **Clean codebase**: Remove redundant files, follow project structure strictly
 - **Unique design identity**: Create distinctive, memorable interfaces
 
-## Tech Stack
-- **Frontend**: Vite + React + TypeScript + shadcn/ui + Tailwind CSS v3
+## Current Tech Stack (2025)
+- **Frontend**: Vite + React + TypeScript + shadcn/ui + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript with ES modules
-- **APIs**: Free-tier services only (Blockchair, Etherscan)
+- **APIs**: Free-tier services (Blockchair, Etherscan, CoinGecko)
+- **Package Manager**: pnpm 10.0.0 (specified in package.json)
+- **Node Version**: 24.x (locked via .nvmrc)
 - **No traditional fonts**: Use Inter, SF Pro, system-ui, -apple-system
-- **Component Library**: shadcn/ui primitives for consistency
 
 ## Project Structure
 ```
@@ -106,7 +107,7 @@ crypto-guardian/
 }
 ```
 
-### Design Enhancements (Recent)
+### Design Enhancements (Current)
 - **Glass morphism cards**: Enhanced backdrop blur with shimmer effects
 - **Tech grid background**: Subtle pattern for digital aesthetic
 - **Neon glow effects**: Pulsing accent elements
@@ -115,6 +116,7 @@ crypto-guardian/
 - **Status indicators**: System online/badges
 - **Micro-interactions**: Transform animations and gradient sweeps
 - **Sophisticated typography**: Enhanced hierarchy and tracking
+- **Chrome security compliant**: Added targetAddressSpace for local network access
 
 ### Forbidden Patterns
 - ❌ Multiple files with same purpose
@@ -123,6 +125,8 @@ crypto-guardian/
 - ❌ Mixed import styles (ESM + CommonJS)
 - ❌ Unused code left in files
 - ❌ Generic, uninspired designs
+- ❌ Skipping build/lint validation before commits
+- ❌ Missing form field attributes (id/name)
 
 ### Pre-Commit Checklist
 - [ ] Build passes: `pnpm build`
@@ -133,6 +137,9 @@ crypto-guardian/
 - [ ] Modern, professional, unique design
 - [ ] shadcn/ui components used properly
 - [ ] Dark theme optimized
+- [ ] Form fields have id/name attributes
+- [ ] Local network requests handled (targetAddressSpace)
+- [ ] Environment variables documented
 
 ### Priority Order
 1. Code quality & build success
