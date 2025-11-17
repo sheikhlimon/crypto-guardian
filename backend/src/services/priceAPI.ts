@@ -99,11 +99,11 @@ export const convertToUSD = async (
 
     // If price is 0 (API failed), return estimated value based on common prices
     const fallbackPrices: Record<BlockchainType, number> = {
-      ethereum: 3000, // ~$3000 ETH
-      bitcoin: 60000, // ~$60k BTC
-      'binance-smart-chain': 300, // ~$300 BNB
-      polygon: 0.8, // ~$0.8 MATIC
-      arbitrum: 0.8, // ~$0.8 ARB
+      ethereum: 3500, // ~$3500 ETH (updated 2025)
+      bitcoin: 95000, // ~$95k BTC (updated 2025)
+      'binance-smart-chain': 700, // ~$700 BNB (updated 2025)
+      polygon: 0.5, // ~$0.5 MATIC (updated 2025)
+      arbitrum: 0.8, // ~$0.8 ARB (updated 2025)
     }
 
     const effectivePrice = price > 0 ? price : fallbackPrices[blockchain] || 0
@@ -133,10 +133,10 @@ export const convertToUSD = async (
     // Fallback calculation with hardcoded prices
     try {
       const fallbackPrices: Record<BlockchainType, number> = {
-        ethereum: 3000,
-        bitcoin: 60000,
-        'binance-smart-chain': 300,
-        polygon: 0.8,
+        ethereum: 3500,
+        bitcoin: 95000,
+        'binance-smart-chain': 700,
+        polygon: 0.5,
         arbitrum: 0.8,
       }
 
