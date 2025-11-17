@@ -44,7 +44,20 @@ class APIClient {
   }
 
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    return this.request<{ status: string; timestamp: string }>('/../health')
+    const url = `${this.baseURL}/health`
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error || `HTTP error! status: ${response.status}`)
+    }
+
+    return data
   }
 }
 
