@@ -17,7 +17,7 @@ const blockchainToCoinId: Record<BlockchainType, string> = {
   arbitrum: 'arbitrum',
 }
 
-// Get current price for a blockchain
+// Get current price for a blockchain with fallback API sources
 export const getCurrentPrice = async (blockchain: BlockchainType): Promise<number> => {
   const cacheKey = `price-${blockchain}`
 
@@ -27,6 +27,7 @@ export const getCurrentPrice = async (blockchain: BlockchainType): Promise<numbe
     return cachedPrice
   }
 
+  // Try CoinGecko API first
   try {
     const coinId = blockchainToCoinId[blockchain]
 
@@ -36,7 +37,7 @@ export const getCurrentPrice = async (blockchain: BlockchainType): Promise<numbe
         vs_currencies: 'usd',
         include_24hr_change: false,
       },
-      timeout: 10000,
+      timeout: 8000, // Reduced timeout
       headers: {
         'User-Agent': 'Crypto-Guardian/1.0',
         Accept: 'application/json',
@@ -45,19 +46,47 @@ export const getCurrentPrice = async (blockchain: BlockchainType): Promise<numbe
 
     const price = response.data[coinId]?.usd || 0
 
-    // Cache the price
-    priceCache.set(cacheKey, price)
-
-    return price
+    if (price > 0) {
+      // Cache the price
+      priceCache.set(cacheKey, price)
+      return price
+    }
   } catch (error) {
     console.error('Error fetching price from CoinGecko:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       blockchain,
     })
-
-    // Return 0 on error
-    return 0
   }
+
+  // Try CoinMarketCap as fallback (simple public endpoint)
+  try {
+    const response = await axios.get(
+      `https://api.coinmarketcap.com/v1/ticker/${blockchainToCoinId[blockchain]}/`,
+      {
+        timeout: 8000,
+        headers: {
+          'User-Agent': 'Crypto-Guardian/1.0',
+          Accept: 'application/json',
+        },
+      }
+    )
+
+    const price = response.data?.[0]?.price_usd ? parseFloat(response.data[0].price_usd) : 0
+
+    if (price > 0) {
+      priceCache.set(cacheKey, price)
+      return price
+    }
+  } catch (error) {
+    console.error('Error fetching price from CoinMarketCap:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      blockchain,
+    })
+  }
+
+  // If all APIs fail, cache and return 0 to trigger fallback prices
+  priceCache.set(cacheKey, 0, { ttl: 60 }) // Cache for 1 minute only
+  return 0
 }
 
 // Convert balance to USD value
@@ -67,6 +96,17 @@ export const convertToUSD = async (
 ): Promise<string> => {
   try {
     const price = await getCurrentPrice(blockchain)
+
+    // If price is 0 (API failed), return estimated value based on common prices
+    const fallbackPrices: Record<BlockchainType, number> = {
+      ethereum: 3000, // ~$3000 ETH
+      bitcoin: 60000, // ~$60k BTC
+      'binance-smart-chain': 300, // ~$300 BNB
+      polygon: 0.8, // ~$0.8 MATIC
+      arbitrum: 0.8, // ~$0.8 ARB
+    }
+
+    const effectivePrice = price > 0 ? price : fallbackPrices[blockchain] || 0
 
     // Convert balance from wei/satoshi to standard units
     let standardBalance = '0'
@@ -83,13 +123,40 @@ export const convertToUSD = async (
 
     // Calculate USD value
     const balanceInCrypto = parseFloat(standardBalance)
-    const usdValue = balanceInCrypto * price
+    const usdValue = balanceInCrypto * effectivePrice
 
     // Return formatted USD value
     return usdValue.toFixed(2)
   } catch (error) {
     console.error('Error converting to USD:', error)
-    return '0'
+
+    // Fallback calculation with hardcoded prices
+    try {
+      const fallbackPrices: Record<BlockchainType, number> = {
+        ethereum: 3000,
+        bitcoin: 60000,
+        'binance-smart-chain': 300,
+        polygon: 0.8,
+        arbitrum: 0.8,
+      }
+
+      let standardBalance = '0'
+
+      if (blockchain === 'bitcoin') {
+        const satoshis = BigInt(balance) || 0n
+        standardBalance = (Number(satoshis) / 100000000).toString()
+      } else {
+        const wei = BigInt(balance) || 0n
+        standardBalance = (Number(wei) / 1e18).toString()
+      }
+
+      const balanceInCrypto = parseFloat(standardBalance)
+      const usdValue = balanceInCrypto * (fallbackPrices[blockchain] || 0)
+
+      return usdValue.toFixed(2)
+    } catch {
+      return '0'
+    }
   }
 }
 
