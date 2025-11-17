@@ -3,6 +3,10 @@ import { Search, AlertCircle } from 'lucide-react'
 import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
 import { useTheme } from '../contexts/ThemeContext'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Alert, AlertDescription } from './ui/alert'
+import { Card, CardContent } from './ui/card'
 import type { AddressCheckResponse } from '../types/api'
 
 interface AddressInputProps {
@@ -79,85 +83,79 @@ export default function AddressInput({ onCheck, isLoading, setIsLoading }: Addre
     }
   }
 
-  // Determine input state classes
-  const getInputClasses = () => {
-    const baseClasses =
-      'w-full px-4 py-4 text-lg rounded-xl transition-all duration-200 focus:outline-none'
-
-    if (error) {
-      return `${baseClasses} glass-input border-2 border-red-400 ${isDarkMode ? 'text-red-200' : 'text-red-900'} focus:border-red-500 focus:ring-2 focus:ring-red-200`
-    }
-
-    if (address && !error && touched) {
-      return `${baseClasses} glass-input border-2 border-green-400 ${isDarkMode ? 'text-green-200' : 'text-green-900'} focus:border-green-500 focus:ring-2 focus:ring-green-200`
-    }
-
-    return `${baseClasses} glass-input border-2 ${isDarkMode ? 'text-white border-white/40' : 'text-gray-900 border-white/40'} ${isDarkMode ? 'focus:border-blue-400' : 'focus:border-blue-500'} focus:ring-2 focus:ring-blue-200`
-  }
-
   return (
     <div className='w-full'>
-      <div className={`glass-card rounded-xl p-6 ${isDarkMode ? 'border-white/10' : ''}`}>
-        <form onSubmit={handleSubmit}>
-          {/* Input container */}
-          <div className='relative mb-4'>
-            <input
-              type='text'
-              value={address}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              placeholder='Enter crypto address (0x..., 1..., bc1...)'
-              className={getInputClasses()}
-              disabled={isLoading}
-              autoComplete='off'
-              spellCheck={false}
-            />
+      <Card className="glass-effect relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+        <CardContent className='p-6 relative z-10'>
+          <form onSubmit={handleSubmit}>
+            {/* Input container */}
+            <div className='relative mb-4'>
+              <Input
+                type='text'
+                value={address}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                placeholder='Enter crypto address (0x..., 1..., bc1...)'
+                className={`text-base h-12 pr-12 transition-all ${
+                  error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : 
+                  address && !error && touched ? "border-green-500 focus:border-green-500 focus:ring-green-500/20" : 
+                  "focus:ring-primary/20"
+                }`}
+                disabled={isLoading}
+                autoComplete='off'
+                spellCheck={false}
+              />
 
-            {/* Search icon */}
-            <div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
-              {isLoading ? (
-                <div className='animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full' />
-              ) : (
-                <Search className={`h-5 w-5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-              )}
+              {/* Search icon */}
+              <div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
+                {isLoading ? (
+                  <div className='relative'>
+                    <div className='animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full'></div>
+                    <div className='absolute inset-0 h-5 w-5 border-2 border-primary/20 border-t-transparent rounded-full animate-spin' style={{ animationDelay: '0.1s' }}></div>
+                  </div>
+                ) : (
+                  <Search className='h-5 w-5 text-muted-foreground' />
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Error message */}
-          {error && (
-            <div
-              className={`mb-4 flex items-center space-x-2 text-sm ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}
+            {/* Error message */}
+            {error && (
+              <Alert variant="destructive" className='mb-4 relative overflow-hidden'>
+                <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 to-red-600"></div>
+                <AlertCircle className='h-4 w-4' />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Submit button */}
+            <Button
+              type='submit'
+              disabled={!address || !!error || isLoading}
+              className='w-full h-12 text-base font-semibold transition-all hover:shadow-lg relative overflow-hidden group'
             >
-              <AlertCircle className='h-4 w-4 flex-shrink-0' />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Submit button */}
-          <button
-            type='submit'
-            disabled={!address || !!error || isLoading}
-            className={`
-            glass-button w-full px-6 py-3 text-lg font-semibold rounded-xl
-            ${
-              address && !error && !isLoading
-                ? `${isDarkMode ? 'text-white' : 'text-gray-900'} hover:shadow-lg`
-                : 'opacity-50 cursor-not-allowed'
-            }
-          `}
-          >
-            {isLoading ? 'Checking Address...' : 'Check Wallet Safety'}
-          </button>
-        </form>
-      </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 transform translate-x-full group-hover:translate-x-0 transition-transform"></div>
+              <span className="relative z-10">{isLoading ? 'Checking Address...' : 'Check Wallet Safety'}</span>
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
       {/* Help text */}
       <div className='mt-4 text-center'>
-        <div
-          className={`inline-block text-sm px-4 py-2 glass-morphism-dark rounded-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}
-        >
-          <p>Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains</p>
-        </div>
+        <Card className="glass-effect inline-block relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50"></div>
+          <CardContent className='px-6 py-3 relative z-10'>
+            <div className='flex items-center space-x-2'>
+              <div className='w-1.5 h-1.5 bg-primary rounded-full'></div>
+              <p className='text-sm text-muted-foreground'>
+                Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains
+              </p>
+              <div className='w-1.5 h-1.5 bg-primary rounded-full'></div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
