@@ -140,35 +140,47 @@ export const etherscanAPI = async (
 // 3. BlockCypher API (Free, 5 requests/second)
 export const blockCypherAPI = async (
   address: string,
-  _blockchain: BlockchainType
+  blockchain: BlockchainType
 ): Promise<AddressData | null> => {
   await rateLimit('blockcypher')
 
   try {
-    const networkMap = {
-      bitcoin: 'btc',
-      ethereum: 'eth',
-      'binance-smart-chain': 'bcs', // Testnet
-      polygon: 'eth-polygon', // Through ETH endpoint
-      arbitrum: 'eth-arbitrum', // Through ETH endpoint
+    // Only support Bitcoin and Ethereum on BlockCypher
+    if (blockchain === 'bitcoin') {
+      const response = await axios.get(`https://api.blockcypher.com/v1/btc/main/addrs/${address}`, {
+        timeout: 10000,
+        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+      })
+
+      const data = response.data
+      return {
+        address,
+        balance: data.balance?.toString() || '0',
+        transaction_count: data.n_tx || 0,
+        total_value: (parseFloat(data.total_received || '0') / 100000000).toString(),
+      }
+    } else if (blockchain === 'ethereum') {
+      const response = await axios.get(`https://api.blockcypher.com/v1/eth/main/addrs/${address}`, {
+        timeout: 10000,
+        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+      })
+
+      const data = response.data
+      return {
+        address,
+        balance: data.balance?.toString() || '0',
+        transaction_count: data.n_tx || 0,
+        total_value: data.total_received || '0',
+      }
     }
 
-    const network = networkMap[_blockchain] || 'btc'
-
-    const response = await axios.get(`https://api.blockcypher.com/v1/${network}/addrs/${address}`, {
-      timeout: 10000,
-      headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
-    })
-
-    const data = response.data
-    return {
-      address,
-      balance: data.balance || '0',
-      transaction_count: data.n_tx || 0,
-      total_value: (parseFloat(data.total_received || '0') / 100000000).toString(),
-    }
-  } catch {
-    console.error('BlockCypher API error')
+    // Skip BlockCypher for other chains
+    return null
+  } catch (error) {
+    console.error(
+      'BlockCypher API error:',
+      error instanceof Error ? error.message : 'Unknown error'
+    )
     return null
   }
 }
