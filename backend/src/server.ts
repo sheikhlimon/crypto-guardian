@@ -18,17 +18,47 @@ app.use(rateLimiter)
 app.use(validateRequest)
 app.use(securityHeaders)
 
+// Root endpoint for basic connectivity check
+app.get('/', (req, res) => {
+  res.status(200).send('Crypto Guardian API - OK')
+})
+
 // API Routes
 app.use('/api', checkAddressRoutes)
 
-// Health check endpoint
+// Health check endpoint (for Uptime Robot and monitoring)
 app.get('/health', (req, res) => {
+  // Set appropriate headers for uptime monitoring
+  res.setHeader('Content-Type', 'application/json')
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
   })
+})
+
+// Warm-up endpoint to prevent cold starts
+app.get('/warmup', async (req, res) => {
+  try {
+    // Initialize price cache asynchronously
+    await initializePriceCache()
+
+    res.status(200).json({
+      status: 'warmed',
+      timestamp: new Date().toISOString(),
+      message: 'Backend warmed up successfully',
+    })
+  } catch (error) {
+    console.error('Warmup failed:', error)
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      message: 'Warmup failed',
+    })
+  }
 })
 
 // Debug endpoint to test API connectivity
@@ -103,18 +133,16 @@ app.use((err: unknown, req: express.Request, res: express.Response) => {
 })
 
 // Start server
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.error('🚀 Crypto Guardian API server running on port', PORT)
   console.error('📊 Health check: http://localhost:', `${PORT}/health`)
   console.error('🔍 API endpoint: http://localhost:', `${PORT}/api/check-address`)
+  console.error('🔥 Warm-up endpoint: http://localhost:', `${PORT}/warmup`)
 
-  // Initialize price cache
-  try {
-    await initializePriceCache()
-    console.error('💰 Price cache initialized successfully')
-  } catch (error) {
-    console.error('⚠️ Failed to initialize price cache:', error)
-  }
+  // Initialize price cache asynchronously (non-blocking)
+  initializePriceCache()
+    .then(() => console.error('💰 Price cache initialized successfully'))
+    .catch(error => console.error('⚠️ Failed to initialize price cache:', error))
 })
 
 export default app

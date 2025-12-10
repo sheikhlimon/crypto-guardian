@@ -6,6 +6,9 @@ services:
     rootDir: backend
     buildCommand: pnpm install && pnpm run build
     startCommand: pnpm start
+    healthCheckPath: /health
+    healthCheckTimeout: 100
+    healthCheckInterval: 10
     envVars:
       - key: NODE_ENV
         value: production

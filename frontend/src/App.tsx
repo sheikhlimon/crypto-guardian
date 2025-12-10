@@ -15,12 +15,24 @@ function App() {
   const { isDarkMode, toggleDarkMode } = useTheme()
 
   useEffect(() => {
-    // Simulate initialization delay for cold start effect
-    const timer = setTimeout(() => {
-      setHasLoaded(true)
-    }, 1500)
+    // Warm up the backend to prevent cold starts
+    const warmUpBackend = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/warmup`
+        )
+        if (response.ok) {
+          console.warn('Backend warmed up successfully')
+        }
+      } catch (error) {
+        console.warn('Backend warmup failed, but continuing:', error)
+      }
 
-    return () => clearTimeout(timer)
+      setHasLoaded(true)
+    }
+
+    // Start warmup immediately
+    warmUpBackend()
   }, [])
 
   return (

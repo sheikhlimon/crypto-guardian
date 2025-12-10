@@ -33,17 +33,41 @@ class APIClient {
 
   async checkAddress(address: string): Promise<AddressCheckResponse> {
     const requestBody: AddressCheckRequest = { address }
-    const response = await this.request<{ success: boolean; data: AddressCheckResponse }>(
-      '/check-address',
-      {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-      }
-    )
 
-    // Backend returns wrapped response with success and data
-    // Return the unwrapped data
-    return response.data
+    // Add retry logic for cold starts
+    const maxRetries = 3
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.request<{ success: boolean; data: AddressCheckResponse }>(
+          '/check-address',
+          {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            // signal: AbortSignal.timeout(baseTimeout * attempt), // Increase timeout for each retry
+          }
+        )
+
+        // Backend returns wrapped response with success and data
+        // Return the unwrapped data
+        return response.data
+      } catch (error) {
+        // If it's a timeout or connection error and we have retries left, try again
+        if (
+          error instanceof Error &&
+          (error.message.includes('timeout') || error.message.includes('fetch')) &&
+          attempt < maxRetries
+        ) {
+          console.warn(`Retry attempt ${attempt}/${maxRetries} for address check`)
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+          continue
+        }
+        throw error
+      }
+    }
+
+    throw new Error('Failed after maximum retry attempts')
   }
 
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
