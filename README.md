@@ -72,7 +72,7 @@ Access at:
 
 - **Frontend**: Vite + React + TypeScript + shadcn/ui + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript
-- **API Integration**: Etherscan, Blockchair, and CoinGecko APIs
+- **API Integration**: Etherscan, BlockCypher, and CoinGecko APIs
 
 ## API
 

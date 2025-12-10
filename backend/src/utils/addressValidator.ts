@@ -1,4 +1,4 @@
-import type { AddressValidationResult, BlockchainType } from '../types'
+import type { AddressValidationResult } from '../types'
 
 // Ethereum address patterns
 const ETHEREUM_PATTERN = /^0x[a-fA-F0-9]{40}$/i
@@ -73,15 +73,4 @@ export const validateAddress = (address: string): AddressValidationResult => {
     isValid: false,
     blockchain: 'ethereum', // default
   }
-}
-
-export const getBlockchairBlockchain = (blockchain: BlockchainType): string => {
-  const mapping = {
-    ethereum: 'ethereum',
-    bitcoin: 'bitcoin',
-    'binance-smart-chain': 'binance-smart-chain',
-    polygon: 'polygon',
-    arbitrum: 'arbitrum',
-  }
-  return mapping[blockchain]
 }

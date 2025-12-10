@@ -237,7 +237,9 @@ function App() {
               <span className='text-xs tracking-widest font-medium'>CRYPTO GUARDIAN</span>
               <div className='w-1 h-1 bg-primary rounded-full'></div>
             </div>
-            <p className='text-sm'>Powered by Blockchair API • Built with ❤️ for crypto safety</p>
+            <p className='text-sm'>
+              Powered by Etherscan & BlockCypher APIs • Built with ❤️ for crypto safety
+            </p>
           </div>
         </div>
       </footer>

@@ -25,8 +25,8 @@
 - **Replit**: Free online development environment
 
 ### Free Data & APIs
-- **Blockchair**: Unlimited free blockchain API
 - **Etherscan**: Free Ethereum blockchain data
+- **BlockCypher**: Free Bitcoin/Ethereum blockchain data
 - **Scam Databases**: Multiple public GitHub repositories
 - **Open Source**: All tools and libraries are free
 
@@ -51,7 +51,7 @@
 #### Technology Stack
 - **Frontend**: React.js with Vite (fast setup, minimal boilerplate)
 - **Backend**: Node.js with Express (simple, lightweight)
-- **API**: Blockchair API (free tier, multi-chain support)
+- **API**: Etherscan + BlockCypher APIs (free tier, multi-chain support)
 - **Local Data**: ScamCryptoWallets database (static JSON)
 - **Styling**: Tailwind CSS (rapid styling, good defaults)
 
@@ -116,9 +116,9 @@ Response:
    }
    ```
 
-2. **Blockchair API Integration**
-   - Get address balance & transaction count
-   - Fetch recent transactions (last 50)
+2. **API Integration**
+   - Get address balance & transaction count from Etherscan
+   - Fetch recent transactions from BlockCypher
    - Check blockchain type (ETH, BTC, etc.)
 
 3. **Simple Heuristics** (Easy to implement):
@@ -143,8 +143,8 @@ Response:
 
 #### Action Steps
 1. **Multiple Free APIs Integration**:
-   - Blockchair (free tier) - Multi-chain data
-   - Etherscan API (free) - Ethereum deep analysis  
+   - Etherscan API (free) - Ethereum deep analysis
+   - BlockCypher API (free) - Multi-chain data
    - Chainabuse API (free tier) - Scam reports
    - SlowMist SDK (free) - Local scam checking
 
@@ -203,7 +203,7 @@ Response:
 
 ### Trust Signals
 - Security badge icons
-- "Powered by Blockchair" attribution
+- "Powered by Etherscan & BlockCypher" attribution
 - Clear privacy policy
 - Transparent data sources
 - Professional typography
@@ -217,16 +217,21 @@ Response:
 
 ## API Integration Cheat Sheet
 
-### Blockchair API (Free Tier)
+### Etherscan API (Free Tier)
+```javascript
+// Get address balance
+https://api.etherscan.io/api?module=account&action=balance&address=ADDRESS&tag=latest
+
+### BlockCypher API (Free Tier)
 ```javascript
 // Get address info
-https://api.blockchair.com/tools/price-conversion?state=latest
+https://api.blockcypher.com/v1/btc/main/addrs/ADDRESS
 
 // Check Ethereum address
-https://api.blockchair.com/ethereum/dashboards/address/{address}
+https://api.blockcypher.com/v1/eth/main/addrs/{address}
 
 // Get transactions
-https://api.blockchair.com/ethereum/transactions?address={address}&limit=50
+https://api.blockcypher.com/v1/btc/main/addrs/{address}/full?limit=50
 ```
 
 ### Response Structure to Handle
@@ -301,8 +306,8 @@ crypto-guardian/
 ## Resources Mentioned in Blueprint
 
 ### 100% FREE Data Sources
-- **Blockchair API**: Unlimited free tier, multi-chain support
-- **Etherscan API**: Free tier for Ethereum analysis
+- **Etherscan API**: Free Ethereum blockchain data
+- **BlockCypher API**: Free multi-chain blockchain data
 - **Chainabuse API**: Free tier (10 calls/month) + public scam database
 - **SlowMist SDK**: Free malicious wallet database download
 - **ScamCryptoWallets**: 14,391 reported malicious addresses (public CSV)

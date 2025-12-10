@@ -175,10 +175,13 @@ export const blockCypherAPI = async (
         total_value: (parseFloat(data.total_received || '0') / 100000000).toString(),
       }
     } else if (blockchain === 'ethereum') {
-      const response = await axios.get(`https://api.blockcypher.com/v1/eth/main/addrs/${address}`, {
-        timeout: 10000,
-        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
-      })
+      const response = await axios.get(
+        `https://api.blockcypher.com/v1/eth/main/addrs/${address}/balance`,
+        {
+          timeout: 10000,
+          headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+        }
+      )
 
       const data = response.data
       return {
@@ -193,7 +196,9 @@ export const blockCypherAPI = async (
     return null
   } catch (error) {
     console.error(
-      'BlockCypher API error:',
+      'BlockCypher API error for',
+      blockchain,
+      ':',
       error instanceof Error ? error.message : 'Unknown error'
     )
     return null
@@ -222,28 +227,20 @@ export const getAddressData = async (
     // For Ethereum chains: Etherscan + BlockCypher in parallel
     apiPromises = [etherscanAPI(address, blockchain), blockCypherAPI(address, blockchain)]
   } else if (blockchain === 'bitcoin') {
-    // For Bitcoin: Blockchain.com + BlockCypher in parallel
-    apiPromises = [blockchainInfoAPI(address, blockchain), blockCypherAPI(address, blockchain)]
+    // For Bitcoin: BlockCypher in parallel
+    apiPromises = [blockCypherAPI(address, blockchain)]
   } else {
     // Default fallback
     return localAnalysis(address, blockchain)
   }
 
-  // Add local analysis as fallback
-  const fallbackPromise = Promise.resolve(localAnalysis(address, blockchain))
-
-  // Run all APIs in parallel with timeout
-  const timeoutPromise = new Promise<AddressData | null>((_, reject) => {
-    setTimeout(() => reject(new Error('API timeout')), 8000)
-  })
-
   try {
-    // Race between the APIs and timeout
+    // Wait for the first successful API result with timeout
     const result = await Promise.race([
-      // Try to get the first successful result
       Promise.any(apiPromises),
-      fallbackPromise,
-      timeoutPromise,
+      new Promise<AddressData>((_, reject) =>
+        setTimeout(() => reject(new Error('API timeout')), 5000)
+      ),
     ])
 
     // If we got a valid result, calculate USD value

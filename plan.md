@@ -19,7 +19,8 @@
 - [x] TypeScript interfaces and type safety
 
 ### Backend API
-- [x] Blockchair API integration
+- [x] Etherscan API integration
+- [x] BlockCypher API integration
 - [x] Address checking endpoint
 - [x] Suspicious pattern detection heuristics
 - [x] Caching layer with node-cache
@@ -38,7 +39,7 @@
 ### Working Features
 - **Address Input**: Real-time validation, modern design
 - **Risk Assessment**: Scam detection, pattern analysis
-- **API Integration**: Blockchair blockchain data
+- **API Integration**: Etherscan & BlockCypher blockchain data
 - **Caching**: Performance optimization
 - **Modern UI**: Glass morphism, gradients, Inter font
 

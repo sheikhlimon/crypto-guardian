@@ -10,7 +10,7 @@
 ## Current Tech Stack (2025)
 - **Frontend**: Vite + React + TypeScript + shadcn/ui + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript with ES modules
-- **APIs**: Free-tier services (Blockchair, Etherscan, CoinGecko)
+- **APIs**: Free-tier services (Etherscan, BlockCypher, CoinGecko)
 - **Package Manager**: pnpm 10.0.0 (specified in package.json)
 - **Node Version**: 24.x (locked via .nvmrc)
 - **No traditional fonts**: Use Inter, SF Pro, system-ui, -apple-system
