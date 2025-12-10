@@ -40,39 +40,53 @@ export const blockchainInfoAPI = async (
 
   try {
     if (blockchain === 'bitcoin') {
-      const response = await axios.get(`https://blockchain.info/q/address/${address}?format=json`, {
-        timeout: 10000,
-        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
-      })
-
-      const data = response.data
-      return {
-        address,
-        balance: data.final_balance?.toString() || '0',
-        transaction_count: data.n_tx || 0,
-      }
-    } else if (blockchain === 'ethereum') {
-      // Use a simple ETH balance API that doesn't require API key
+      // Use BlockCypher API instead for Bitcoin (more reliable)
       const response = await axios.get(
-        `https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`,
+        `https://api.blockcypher.com/v1/btc/main/addrs/${address}/balance`,
         {
           timeout: 10000,
           headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
         }
       )
 
-      const data = response.data
+      const balance = response.data.balance || 0
       return {
         address,
-        balance: data.ETH?.balance || '0',
-        transaction_count: data.ETH?.txCount || 0,
+        balance: balance.toString(),
+        transaction_count: response.data.n_tx || 0,
+      }
+    } else if (blockchain === 'ethereum') {
+      // Use a public ETH RPC endpoint that doesn't require API key
+      const response = await axios.post(
+        'https://ethereum.publicnode.com',
+        {
+          jsonrpc: '2.0',
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+          id: 1,
+        },
+        {
+          timeout: 10000,
+          headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+        }
+      )
+
+      const balance = response.data?.result || '0x0'
+      return {
+        address,
+        balance: balance,
+        transaction_count: 0, // Not available from this simple endpoint
       }
     }
 
     return null
   } catch (error) {
     console.error(
-      'Blockchain.com API error:',
+      'Blockchain.com API error for',
+      blockchain,
+      'address',
+      address,
+      ':',
       error instanceof Error ? error.message : 'Unknown error'
     )
     return null
