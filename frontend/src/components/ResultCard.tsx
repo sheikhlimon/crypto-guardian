@@ -132,7 +132,7 @@ export default function ResultCard({ result }: ResultCardProps) {
                     dominantBaseline='middle'
                     fontSize='24'
                     fontWeight='bold'
-                    fill={riskScore <= 30 ? '#059669' : riskScore <= 60 ? '#d97706' : '#e11d48'}
+                    fill={riskScore < 25 ? '#059669' : riskScore < 70 ? '#d97706' : '#e11d48'}
                   >
                     {riskScore}
                   </text>
