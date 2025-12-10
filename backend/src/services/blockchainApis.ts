@@ -196,73 +196,59 @@ export const localAnalysis = (address: string, _blockchain: BlockchainType): Add
   }
 }
 
-// Main function that tries multiple APIs in order
+// Main function that tries multiple APIs in parallel
 export const getAddressData = async (
   address: string,
   blockchain: BlockchainType
 ): Promise<AddressData> => {
-  // Try APIs in order of preference based on blockchain
-  const providers = [
-    () => blockchainInfoAPI(address, blockchain),
-    () => etherscanAPI(address, blockchain),
-    () => blockCypherAPI(address, blockchain),
-    () => Promise.resolve(localAnalysis(address, blockchain)),
-  ]
+  // Determine which APIs to try based on blockchain
+  let apiPromises: Promise<AddressData | null>[] = []
 
-  // For Ethereum chains, try Etherscan first
   if (['ethereum', 'binance-smart-chain', 'polygon', 'arbitrum'].includes(blockchain)) {
-    providers.unshift(
-      () => etherscanAPI(address, blockchain),
-      () => blockCypherAPI(address, blockchain),
-      () => Promise.resolve(localAnalysis(address, blockchain))
-    )
-    providers.shift() // Remove blockchainInfoAPI
-  }
-
-  // For Bitcoin, try Blockchain.com first
-  if (blockchain === 'bitcoin') {
-    providers.unshift(
-      () => blockchainInfoAPI(address, blockchain),
-      () => blockCypherAPI(address, blockchain),
-      () => Promise.resolve(localAnalysis(address, blockchain))
-    )
-    providers.shift() // Remove etherscanAPI
-  }
-
-  // Try each provider until one succeeds
-  let result: AddressData | null = null
-  for (const provider of providers) {
-    try {
-      const providerResult = await provider()
-      if (
-        providerResult &&
-        (providerResult.balance !== undefined || providerResult.transaction_count !== undefined)
-      ) {
-        result = providerResult
-        break
-      }
-    } catch {
-      console.error('Provider failed, trying next...')
-    }
-  }
-
-  // If no provider succeeded, use fallback
-  if (!result) {
-    result = localAnalysis(address, blockchain)
-  }
-
-  // Calculate USD value if balance is available
-  if (result.balance) {
-    try {
-      const usdValue = await convertToUSD(result.balance, blockchain)
-      result.total_value = usdValue
-    } catch (error) {
-      console.error('Error calculating USD value:', error)
-      result.total_value = '0'
-    }
+    // For Ethereum chains: Etherscan + BlockCypher in parallel
+    apiPromises = [etherscanAPI(address, blockchain), blockCypherAPI(address, blockchain)]
+  } else if (blockchain === 'bitcoin') {
+    // For Bitcoin: Blockchain.com + BlockCypher in parallel
+    apiPromises = [blockchainInfoAPI(address, blockchain), blockCypherAPI(address, blockchain)]
   } else {
-    result.total_value = '0'
+    // Default fallback
+    return localAnalysis(address, blockchain)
   }
 
-  return result
+  // Add local analysis as fallback
+  const fallbackPromise = Promise.resolve(localAnalysis(address, blockchain))
+
+  // Run all APIs in parallel with timeout
+  const timeoutPromise = new Promise<AddressData | null>((_, reject) => {
+    setTimeout(() => reject(new Error('API timeout')), 8000)
+  })
+
+  try {
+    // Race between the APIs and timeout
+    const result = await Promise.race([
+      // Try to get the first successful result
+      Promise.any(apiPromises),
+      fallbackPromise,
+      timeoutPromise,
+    ])
+
+    // If we got a valid result, calculate USD value
+    if (result && result.balance) {
+      try {
+        const usdValue = await convertToUSD(result.balance, blockchain)
+        result.total_value = usdValue
+      } catch (error) {
+        console.error('Error calculating USD value:', error)
+        result.total_value = '0'
+      }
+    } else {
+      if (result) result.total_value = '0'
+    }
+
+    return result || localAnalysis(address, blockchain)
+  } catch (error) {
+    // All APIs failed, use fallback
+    console.error('All APIs failed, using local analysis:', error)
+    return localAnalysis(address, blockchain)
+  }
 }
