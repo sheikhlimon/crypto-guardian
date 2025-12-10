@@ -1,5 +1,5 @@
 import NodeCache from 'node-cache'
-import { RiskAnalyzer } from './riskAnalyzer'
+import { analyzeAddress } from './riskAnalyzer'
 import { validateAddress } from '../utils/addressValidator'
 import { getAddressData } from './blockchainApis'
 import type { BlockchainType } from '../types'
@@ -70,8 +70,7 @@ export const checkAddress = async (address: string) => {
     const transactions = await getRecentTransactions(normalizedAddress, blockchain)
 
     // Analyze with risk analyzer
-    const riskAnalyzer = new RiskAnalyzer()
-    const analysis = riskAnalyzer.analyze(
+    const analysis = analyzeAddress(
       {
         transaction_count: addressData?.transaction_count || 0,
         balance: addressData?.balance || '0',
@@ -95,7 +94,6 @@ export const checkAddress = async (address: string) => {
 
     // Fallback to local analysis only
     const validation = validateAddress(address)
-    const riskAnalyzer = new RiskAnalyzer()
 
     // Create minimal data structure for local analysis
     const minimalData = {
@@ -104,7 +102,7 @@ export const checkAddress = async (address: string) => {
       transaction_count: 0,
     }
 
-    const localAnalysis = riskAnalyzer.analyze(minimalData, [])
+    const localAnalysis = analyzeAddress(minimalData, [])
 
     return {
       address: validation.normalizedAddress || address,
