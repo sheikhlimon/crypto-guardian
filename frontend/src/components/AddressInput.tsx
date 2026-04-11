@@ -23,6 +23,7 @@ export default function AddressInput({
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
+  const [isWakingUp, setIsWakingUp] = useState(false)
 
   const validateAddress = (value: string) => {
     if (!value) {
@@ -65,6 +66,9 @@ export default function AddressInput({
 
     setIsLoading(true)
     setError('')
+    setIsWakingUp(false)
+
+    const wakeUpTimer = setTimeout(() => setIsWakingUp(true), 3000)
 
     try {
       const result = await checkAddress(address)
@@ -80,7 +84,9 @@ export default function AddressInput({
       setError('Something went wrong. Please try again.')
       setAnalysisComplete(false)
     } finally {
+      clearTimeout(wakeUpTimer)
       setIsLoading(false)
+      setIsWakingUp(false)
     }
   }
 
@@ -136,7 +142,11 @@ export default function AddressInput({
               {isLoading ? (
                 <>
                   <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
-                  <span>Checking Address...</span>
+                  <span>
+                    {isWakingUp
+                      ? 'Waking up server, this can take up to 50s...'
+                      : 'Checking Address...'}
+                  </span>
                 </>
               ) : (
                 <>
