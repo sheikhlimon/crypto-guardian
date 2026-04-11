@@ -37,8 +37,8 @@ function App() {
         <div className='max-w-5xl mx-auto px-4 sm:px-6'>
           <div className='flex items-center justify-between h-14'>
             <div className='flex items-center space-x-2.5'>
-              <div className='w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center'>
-                <Shield className='h-4 w-4 text-primary' />
+              <div className='w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center overflow-hidden'>
+                <img src='/crypto-guardian.svg' alt='Crypto Guardian' className='h-5 w-5' />
               </div>
               <span className='text-lg font-semibold tracking-tight'>Crypto Guardian</span>
             </div>

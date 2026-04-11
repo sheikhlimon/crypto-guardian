@@ -32,7 +32,6 @@ export const checkAddress = async (address: string) => {
         transaction_count: addressData?.transaction_count || 0,
         balance: addressData?.balance || '0',
       },
-      [],
       blockchain
     )
 
@@ -55,25 +54,23 @@ export const checkAddress = async (address: string) => {
 
     const localAnalysis = analyzeAddress(
       {
-        address: validation.normalizedAddress || address,
         balance: '0',
         transaction_count: 0,
       },
-      [],
       validation.blockchain
     )
 
     return {
       address: validation.normalizedAddress || address,
-      verdict: localAnalysis.verdict || 'CLEAN',
-      risk_score: Math.max(localAnalysis.risk_score || 0, 15),
+      verdict: localAnalysis.verdict,
+      risk_score: localAnalysis.risk_score,
       findings: [
-        'Using multiple free APIs with limited data',
+        'Limited data available — API lookup failed',
         ...localAnalysis.findings.slice(0, 3),
       ],
       transaction_count: 0,
       total_value: '0',
-      recommendation: 'Basic validation completed - verify independently if concerned',
+      recommendation: 'Could not fully analyze — verify independently',
       blockchain: validation.blockchain,
       balance: '0',
     }
