@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import AddressInput from './components/AddressInput'
 import ResultCard from './components/ResultCard'
-import { Shield, Sparkles, Lock, Sun, Moon } from 'lucide-react'
-import { useTheme } from './contexts/ThemeContext'
-import { Button } from './components/ui/button'
+import { Shield, Sparkles, Lock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import type { AddressCheckResponse } from './types/api'
 
@@ -12,10 +10,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [analysisComplete, setAnalysisComplete] = useState(false)
   const [hasLoaded, setHasLoaded] = useState(false)
-  const { isDarkMode, toggleDarkMode } = useTheme()
 
   useEffect(() => {
-    // Warm up the backend to prevent cold starts
     const warmUpBackend = async () => {
       try {
         const response = await fetch(
@@ -27,134 +23,68 @@ function App() {
       } catch (error) {
         console.warn('Backend warmup failed, but continuing:', error)
       }
-
       setHasLoaded(true)
     }
-
-    // Start warmup immediately
     warmUpBackend()
   }, [])
 
   return (
-    <div className={`min-h-screen bg-background ${isDarkMode ? '' : 'shield-pattern'}`}>
-      {/* Tech Grid Background */}
-      <div className='tech-grid'></div>
-
-      {/* Floating Background Orbs */}
-      <div
-        className={`floating-orb w-96 h-96 ${isDarkMode ? 'bg-blue-500/5' : 'bg-blue-400/8'} -top-48 -left-48 fixed`}
-      ></div>
-      <div
-        className={`floating-orb w-96 h-96 ${isDarkMode ? 'bg-purple-500/5' : 'bg-purple-400/8'} -bottom-48 -right-48 fixed`}
-        style={{ animationDelay: '12s' }}
-      />
-      <div
-        className={`floating-orb w-64 h-64 ${isDarkMode ? 'bg-cyan-500/5' : 'bg-indigo-400/8'} top-1/2 left-1/2 fixed`}
-        style={{ animationDelay: '6s' }}
-      />
+    <div className='min-h-screen bg-background relative'>
+      <div className='dot-grid' />
 
       {/* Header */}
-      <header className='glass-effect sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl relative overflow-hidden'>
-        {/* Animated header accent line */}
-        <div
-          className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${isDarkMode ? 'from-blue-500 via-purple-500 to-blue-500' : 'from-blue-600 via-purple-600 to-blue-600'} w-full neon-glow`}
-        ></div>
-
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='flex items-center justify-between h-16'>
-            <div className='flex items-center space-x-3'>
-              <div className='glass-effect p-2 rounded-lg bg-primary/10 relative group'>
-                <div className='absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'></div>
-                <Shield className='h-6 w-6 text-primary relative z-10' />
+      <header className='sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm'>
+        <div className='max-w-5xl mx-auto px-4 sm:px-6'>
+          <div className='flex items-center justify-between h-14'>
+            <div className='flex items-center space-x-2.5'>
+              <div className='w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center'>
+                <Shield className='h-4 w-4 text-primary' />
               </div>
-              <div className='flex flex-col'>
-                <h1 className='text-2xl font-bold text-foreground leading-tight'>
-                  Crypto Guardian
-                </h1>
-                <span className='text-xs text-muted-foreground font-medium tracking-wider'>
-                  SECURITY PROTOCOL
-                </span>
-              </div>
+              <span className='text-lg font-semibold tracking-tight'>Crypto Guardian</span>
             </div>
-            <div className='flex items-center space-x-6 text-sm'>
-              <div className='hidden sm:flex items-center space-x-2 text-muted-foreground'>
-                <Lock className='h-4 w-4' />
-                <span className='font-medium'>Secure</span>
-              </div>
-              <Button
-                variant='ghost'
-                size='icon'
-                onClick={toggleDarkMode}
-                className='hover:bg-accent relative group'
-              >
-                <div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity'></div>
-                {isDarkMode ? (
-                  <Sun className='h-4 w-4 relative z-10' />
-                ) : (
-                  <Moon className='h-4 w-4 relative z-10' />
-                )}
-              </Button>
+            <div className='flex items-center space-x-1.5 text-xs text-muted-foreground'>
+              <Lock className='h-3 w-3' />
+              <span>Secure</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className='max-w-4xl mx-auto px-4 py-8 relative z-10'>
+      {/* Main */}
+      <main className='max-w-2xl mx-auto px-4 py-12 relative z-10'>
         <div className='text-center mb-8'>
-          <div className='inline-flex items-center justify-center p-1 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 mb-6'>
-            <div className='flex items-center space-x-2 px-6 py-3 rounded-full glass-effect border border-primary/20'>
-              <div
-                className={`w-3 h-3 ${analysisComplete ? 'bg-emerald-400' : 'bg-cyan-400'} ${hasLoaded && !analysisComplete ? 'animate-pulse' : ''} rounded-full shadow-lg shadow-${analysisComplete ? 'emerald' : 'cyan'}-500/50`}
-              ></div>
-              <span
-                className={`text-sm font-semibold ${hasLoaded ? (analysisComplete ? 'text-emerald-600 dark:text-emerald-400' : 'text-cyan-600 dark:text-cyan-400') : 'text-muted-foreground'}`}
-              >
-                {hasLoaded ? (
-                  analysisComplete ? (
-                    'ANALYSIS COMPLETE'
-                  ) : (
-                    'SYSTEM READY'
-                  )
-                ) : (
-                  <span className='flex items-center space-x-1'>
-                    <span>INITIALIZING</span>
-                    <div className='flex space-x-0.5'>
-                      <div className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'></div>
-                      <div
-                        className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'
-                        style={{ animationDelay: '0.2s' }}
-                      ></div>
-                      <div
-                        className='w-1 h-1 bg-muted-foreground/60 rounded-full animate-pulse'
-                        style={{ animationDelay: '0.4s' }}
-                      ></div>
-                    </div>
-                  </span>
-                )}
-              </span>
-            </div>
-          </div>
-
-          <h2 className='text-4xl md:text-5xl font-bold mb-4 text-foreground'>
-            Check Wallet
-            <span
-              className={`ml-3 bg-gradient-to-r ${isDarkMode ? 'from-blue-400 to-purple-400' : 'from-blue-600 to-purple-600'} bg-clip-text text-transparent font-semibold`}
-            >
-              Safety
+          {/* Status */}
+          <div className='inline-flex items-center space-x-2 mb-6 text-xs font-mono text-muted-foreground'>
+            <div
+              className={`w-1.5 h-1.5 rounded-full ${
+                !hasLoaded
+                  ? 'bg-muted-foreground animate-pulse'
+                  : analysisComplete
+                    ? 'bg-emerald-500'
+                    : 'bg-primary'
+              }`}
+            />
+            <span>
+              {!hasLoaded
+                ? 'INITIALIZING'
+                : analysisComplete
+                  ? 'ANALYSIS COMPLETE'
+                  : 'SYSTEM READY'}
             </span>
-          </h2>
-
-          <div className='relative inline-block'>
-            <div className='absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl -z-10'></div>
-            <p className='text-lg max-w-2xl mx-auto text-muted-foreground leading-relaxed'>
-              Instant fraud detection for crypto addresses. Analyze wallet safety before you send
-              funds.
-            </p>
           </div>
+
+          {/* Heading */}
+          <h1 className='text-4xl md:text-5xl font-bold tracking-tight mb-3'>
+            Check Wallet <span className='gradient-text'>Safety</span>
+          </h1>
+
+          <p className='text-muted-foreground text-base max-w-md mx-auto leading-relaxed'>
+            Instant fraud detection for crypto addresses. Analyze wallet safety before you send
+            funds.
+          </p>
         </div>
 
-        {/* Address Input Section */}
+        {/* Input */}
         <div className='mb-8'>
           <AddressInput
             onCheck={setResult}
@@ -164,59 +94,53 @@ function App() {
           />
         </div>
 
-        {/* Results Section */}
+        {/* Results */}
         {result && !isLoading && (
-          <div className='w-full'>
+          <div className='w-full animate-fade-in'>
             <ResultCard result={result} />
           </div>
         )}
 
-        {/* Features Grid */}
+        {/* Features */}
         {!result && (
-          <div className='mt-12 grid grid-cols-1 md:grid-cols-3 gap-6'>
-            <Card className='glass-effect group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden'>
-              <div className='absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-transparent rounded-bl-full'></div>
+          <div className='mt-16 grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <Card className='group hover:shadow-md transition-shadow'>
               <CardHeader>
-                <div className='glass-effect w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10 group-hover:bg-primary/20 transition-colors relative'>
-                  <div className='absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity'></div>
-                  <Shield className='h-6 w-6 text-primary relative z-10' />
+                <div className='w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-3'>
+                  <Shield className='h-5 w-5 text-primary' />
                 </div>
-                <CardTitle className='relative z-10'>Real-time Detection</CardTitle>
+                <CardTitle className='text-base'>Real-time Detection</CardTitle>
               </CardHeader>
-              <CardContent className='relative z-10'>
-                <p className='text-muted-foreground'>
+              <CardContent>
+                <p className='text-sm text-muted-foreground'>
                   Instant analysis using multiple blockchain APIs and scam databases.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className='glass-effect group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden'>
-              <div className='absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-500/10 to-transparent rounded-bl-full'></div>
+            <Card className='group hover:shadow-md transition-shadow'>
               <CardHeader>
-                <div className='glass-effect w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10 group-hover:bg-primary/20 transition-colors relative'>
-                  <div className='absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity'></div>
-                  <Sparkles className='h-6 w-6 text-primary relative z-10' />
+                <div className='w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-3'>
+                  <Sparkles className='h-5 w-5 text-primary' />
                 </div>
-                <CardTitle className='relative z-10'>Smart Analysis</CardTitle>
+                <CardTitle className='text-base'>Smart Analysis</CardTitle>
               </CardHeader>
-              <CardContent className='relative z-10'>
-                <p className='text-muted-foreground'>
+              <CardContent>
+                <p className='text-sm text-muted-foreground'>
                   AI-powered pattern recognition for suspicious transaction behaviors.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className='glass-effect group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden'>
-              <div className='absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-bl-full'></div>
+            <Card className='group hover:shadow-md transition-shadow'>
               <CardHeader>
-                <div className='glass-effect w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10 group-hover:bg-primary/20 transition-colors relative'>
-                  <div className='absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity'></div>
-                  <Lock className='h-6 w-6 text-primary relative z-10' />
+                <div className='w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center mb-3'>
+                  <Lock className='h-5 w-5 text-primary' />
                 </div>
-                <CardTitle className='relative z-10'>Privacy First</CardTitle>
+                <CardTitle className='text-base'>Privacy First</CardTitle>
               </CardHeader>
-              <CardContent className='relative z-10'>
-                <p className='text-muted-foreground'>
+              <CardContent>
+                <p className='text-sm text-muted-foreground'>
                   No personal data stored. Your security is our top priority.
                 </p>
               </CardContent>
@@ -226,20 +150,12 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className='glass-effect mt-16 border-t bg-background/60 backdrop-blur-xl relative overflow-hidden'>
-        <div className='absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
-          <div className='w-32 h-px bg-gradient-to-r from-transparent via-primary to-transparent'></div>
-        </div>
-        <div className='max-w-4xl mx-auto px-4 py-6'>
-          <div className='text-center text-muted-foreground'>
-            <div className='flex items-center justify-center space-x-2 mb-2'>
-              <div className='w-1 h-1 bg-primary rounded-full'></div>
-              <span className='text-xs tracking-widest font-medium'>CRYPTO GUARDIAN</span>
-              <div className='w-1 h-1 bg-primary rounded-full'></div>
-            </div>
-            <p className='text-sm'>
-              Powered by Etherscan & BlockCypher APIs • Built with ❤️ for crypto safety
-            </p>
+      <footer className='border-t mt-16 relative z-10'>
+        <div className='max-w-2xl mx-auto px-4 py-6'>
+          <div className='text-center text-xs text-muted-foreground'>
+            <span className='font-mono'>CRYPTO GUARDIAN</span>
+            <span className='mx-2'>·</span>
+            <span>Powered by Etherscan & BlockCypher APIs</span>
           </div>
         </div>
       </footer>

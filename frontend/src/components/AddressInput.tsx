@@ -24,7 +24,6 @@ export default function AddressInput({
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
 
-  // Validate address
   const validateAddress = (value: string) => {
     if (!value) {
       setError('Address is required')
@@ -40,27 +39,23 @@ export default function AddressInput({
     return true
   }
 
-  // Debounced validation
   const debouncedValidation = debounce((value: unknown) => {
     if (touched && typeof value === 'string') {
       validateAddress(value)
     }
   }, 300)
 
-  // Handle input change
   const handleInputChange = (e: { target: { value: string } }) => {
     const value = e.target.value
     setAddress(value)
     debouncedValidation(value)
   }
 
-  // Handle input blur
   const handleBlur = () => {
     setTouched(true)
     validateAddress(address)
   }
 
-  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -91,12 +86,11 @@ export default function AddressInput({
 
   return (
     <div className='w-full'>
-      <Card className='glass-effect relative overflow-hidden'>
-        <div className='absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full'></div>
-        <CardContent className='p-6 relative z-10'>
+      <Card>
+        <CardContent className='p-5'>
           <form onSubmit={handleSubmit}>
-            {/* Input container */}
-            <div className='relative mb-4'>
+            {/* Input */}
+            <div className='relative mb-3'>
               <Input
                 type='text'
                 id='crypto-address'
@@ -105,96 +99,60 @@ export default function AddressInput({
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 placeholder='Enter crypto address (0x..., 1..., bc1...)'
-                className={`text-base h-12 pr-12 transition-all ${
+                className={`font-mono text-sm h-12 pr-10 ${
                   error
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    ? 'border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20'
                     : address && !error && touched
-                      ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                      : 'focus:ring-primary/20'
+                      ? 'border-primary focus-visible:border-primary focus-visible:ring-primary/20'
+                      : ''
                 }`}
                 disabled={isLoading}
                 autoComplete='off'
                 spellCheck={false}
               />
-
-              {/* Search icon */}
-              <div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
+              <div className='absolute right-3 top-1/2 -translate-y-1/2'>
                 {isLoading ? (
-                  <div className='relative'>
-                    <div className='animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full'></div>
-                    <div
-                      className='absolute inset-0 h-5 w-5 border-2 border-primary/20 border-t-transparent rounded-full animate-spin'
-                      style={{ animationDelay: '0.1s' }}
-                    ></div>
-                  </div>
+                  <div className='animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full' />
                 ) : (
-                  <Search className='h-5 w-5 text-muted-foreground' />
+                  <Search className='h-4 w-4 text-muted-foreground' />
                 )}
               </div>
             </div>
 
-            {/* Error message */}
+            {/* Error */}
             {error && (
-              <div className='mb-4'>
-                <Card className='glass-effect border-red-500/20 bg-red-500/5 relative overflow-hidden group'>
-                  <div className='absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-500/5 to-transparent rounded-bl-full'></div>
-                  <CardContent className='p-4 relative z-10'>
-                    <div className='flex items-start space-x-3'>
-                      <div className='flex-shrink-0 mt-0.5'>
-                        <div className='glass-effect w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 relative group'>
-                          <div className='absolute inset-0 bg-gradient-to-br from-red-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'></div>
-                          <AlertCircle className='h-4 w-4 text-red-400 relative z-10' />
-                        </div>
-                      </div>
-                      <div className='flex-1 min-w-0'>
-                        <p className='text-sm font-medium text-red-400 mb-1'>Validation Error</p>
-                        <p className='text-sm text-muted-foreground leading-relaxed'>{error}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className='mb-3 flex items-start gap-2 text-sm text-destructive bg-destructive/5 rounded-md px-3 py-2.5'>
+                <AlertCircle className='h-4 w-4 mt-0.5 flex-shrink-0' />
+                <span>{error}</span>
               </div>
             )}
 
-            {/* Submit button */}
+            {/* Submit */}
             <Button
               type='submit'
               disabled={!address || !!error || isLoading}
-              className='w-full h-13 text-base font-semibold transition-all duration-200 relative overflow-hidden group bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary/95 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-primary/20'
+              className='w-full h-11 text-sm font-medium'
             >
-              <div className='relative z-10 flex items-center justify-center space-x-2'>
-                {isLoading ? (
-                  <>
-                    <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin'></div>
-                    <span>Checking Address...</span>
-                  </>
-                ) : (
-                  <>
-                    <Shield className='w-4 h-4' />
-                    <span>Check Wallet Safety</span>
-                  </>
-                )}
-              </div>
+              {isLoading ? (
+                <>
+                  <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
+                  <span>Checking Address...</span>
+                </>
+              ) : (
+                <>
+                  <Shield className='w-4 h-4' />
+                  <span>Check Wallet Safety</span>
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
       </Card>
 
       {/* Help text */}
-      <div className='mt-4 text-center'>
-        <Card className='glass-effect inline-block relative overflow-hidden'>
-          <div className='absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-50'></div>
-          <CardContent className='px-6 py-3 relative z-10'>
-            <div className='flex items-center space-x-2'>
-              <div className='w-1.5 h-1.5 bg-primary rounded-full'></div>
-              <p className='text-sm text-muted-foreground'>
-                Supports Ethereum (0x...), Bitcoin (1..., bc1...), and other major blockchains
-              </p>
-              <div className='w-1.5 h-1.5 bg-primary rounded-full'></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <p className='mt-3 text-center text-xs text-muted-foreground font-mono'>
+        Supports Ethereum (0x...) · Bitcoin (1..., bc1...) · Other major blockchains
+      </p>
     </div>
   )
 }
