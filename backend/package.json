@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "tsup",
+    "build": "npx tsup",
     "build:only": "tsc",
     "type-check": "tsc --noEmit",
     "start": "node dist/server.js",
