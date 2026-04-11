@@ -1,6 +1,8 @@
 # Crypto Guardian
 
-Crypto fraud detection app that analyzes wallet addresses for suspicious patterns and known scams.
+A crypto wallet safety checker that lets you paste any blockchain address and instantly see if it's safe to interact with. It pulls data from Etherscan, BlockCypher, and CoinGecko to analyze transaction patterns, check against known scam databases, and assign a risk score — so you can avoid sending funds to a malicious wallet.
+
+Built with React, TypeScript, and Express. Supports Ethereum, Bitcoin, and EVM chains.
 
 ## Quick Start
 
