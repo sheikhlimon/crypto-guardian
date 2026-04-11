@@ -1,6 +1,6 @@
 import { Router, type Request, type Response, type Router as RouterType } from 'express'
 import { checkAddress } from '../services/blockchair'
-import { validateAddress } from '../utils/addressValidator'
+import { validateAddress, SUPPORTED_CHAINS } from '../utils/addressValidator'
 import type { AddressCheckResponse } from '../types'
 
 const router: RouterType = Router()
@@ -100,15 +100,7 @@ router.post('/check-address', async (req: Request, res: Response) => {
 router.get('/supported-chains', (req: Request, res: Response) => {
   res.json({
     success: true,
-    data: {
-      chains: [
-        { name: 'Ethereum', symbol: 'ETH', pattern: '0x...' },
-        { name: 'Bitcoin', symbol: 'BTC', pattern: '1..., bc1...' },
-        { name: 'Binance Smart Chain', symbol: 'BSC', pattern: '0x...' },
-        { name: 'Polygon', symbol: 'MATIC', pattern: '0x...' },
-        { name: 'Arbitrum', symbol: 'ARB', pattern: '0x...' },
-      ],
-    },
+    data: { chains: SUPPORTED_CHAINS },
   })
 })
 

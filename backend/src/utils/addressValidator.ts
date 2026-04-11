@@ -1,76 +1,67 @@
-import type { AddressValidationResult } from '../types'
+import type { AddressValidationResult, BlockchainType } from '../types'
 
-// Ethereum address patterns
-const ETHEREUM_PATTERN = /^0x[a-fA-F0-9]{40}$/i
+// All EVM chains share the same address format
+const EVM_PATTERN = /^0x[a-fA-F0-9]{40}$/
 
-// Bitcoin address patterns
-const BITCOIN_LEGACY = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/
-const BITCOIN_SEGWIT = /^[bc1][a-hj-mnp-zAC-HJ-NP-Z0-9]{39,59}$/
-const BITCOIN_TAPROOT = /^bc1p[ac-hj-np-z02-9]{58}$/
+// Map EVM chains to their blockchain identifiers
+const EVM_CHAINS: Record<string, BlockchainType> = {
+  ethereum: 'ethereum',
+  'binance-smart-chain': 'binance-smart-chain',
+  polygon: 'polygon',
+  arbitrum: 'arbitrum',
+}
 
-// BSC address pattern (same as Ethereum)
-const BSC_PATTERN = /^0x[a-fA-F0-9]{40}$/i
-
-// Polygon address pattern (same as Ethereum)
-const POLYGON_PATTERN = /^0x[a-fA-F0-9]{40}$/i
-
-// Arbitrum address pattern (same as Ethereum)
-const ARBITRUM_PATTERN = /^0x[a-fA-F0-9]{40}$/i
+// Bitcoin patterns (legacy, segwit, taproot)
+const BTC_LEGACY = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/
+const BTC_SEGWIT = /^[bc1][a-hj-mnp-zAC-HJ-NP-Z0-9]{39,59}$/
+const BTC_TAPROOT = /^bc1p[ac-hj-np-z02-9]{58}$/
 
 export const validateAddress = (address: string): AddressValidationResult => {
-  const trimmedAddress = address.trim()
+  const trimmed = address.trim()
 
-  // Ethereum and ENS (0x + 40 hex chars)
-  if (ETHEREUM_PATTERN.test(trimmedAddress)) {
+  // EVM chains (Ethereum, BSC, Polygon, Arbitrum all use 0x format)
+  // Since all share the same pattern, we default to ethereum
+  if (EVM_PATTERN.test(trimmed)) {
     return {
       isValid: true,
       blockchain: 'ethereum',
-      normalizedAddress: trimmedAddress.toLowerCase(),
+      normalizedAddress: trimmed.toLowerCase(),
     }
   }
 
-  // Bitcoin (legacy, segwit, taproot)
-  if (
-    BITCOIN_LEGACY.test(trimmedAddress) ||
-    BITCOIN_SEGWIT.test(trimmedAddress) ||
-    BITCOIN_TAPROOT.test(trimmedAddress)
-  ) {
+  // Bitcoin
+  if (BTC_LEGACY.test(trimmed) || BTC_SEGWIT.test(trimmed) || BTC_TAPROOT.test(trimmed)) {
     return {
       isValid: true,
       blockchain: 'bitcoin',
-      normalizedAddress: trimmedAddress,
-    }
-  }
-
-  // BSC (Binance Smart Chain - same as Ethereum)
-  if (BSC_PATTERN.test(trimmedAddress)) {
-    return {
-      isValid: true,
-      blockchain: 'binance-smart-chain',
-      normalizedAddress: trimmedAddress.toLowerCase(),
-    }
-  }
-
-  // Polygon (same as Ethereum)
-  if (POLYGON_PATTERN.test(trimmedAddress)) {
-    return {
-      isValid: true,
-      blockchain: 'polygon',
-      normalizedAddress: trimmedAddress.toLowerCase(),
-    }
-  }
-
-  // Arbitrum (same as Ethereum)
-  if (ARBITRUM_PATTERN.test(trimmedAddress)) {
-    return {
-      isValid: true,
-      blockchain: 'arbitrum',
-      normalizedAddress: trimmedAddress.toLowerCase(),
+      normalizedAddress: trimmed,
     }
   }
 
   return {
     isValid: false,
-    blockchain: 'ethereum', // default
+    blockchain: 'ethereum',
   }
 }
+
+// For display purposes — list all supported chains
+export const SUPPORTED_CHAINS = Object.keys(EVM_CHAINS).map(name => ({
+  name:
+    name === 'binance-smart-chain'
+      ? 'Binance Smart Chain'
+      : name.charAt(0).toUpperCase() + name.slice(1),
+  symbol:
+    name === 'ethereum'
+      ? 'ETH'
+      : name === 'binance-smart-chain'
+        ? 'BSC'
+        : name === 'polygon'
+          ? 'MATIC'
+          : name === 'arbitrum'
+            ? 'ARB'
+            : '',
+  pattern: name === 'bitcoin' ? '1..., bc1...' : '0x...',
+}))
+
+// Add bitcoin to supported chains
+SUPPORTED_CHAINS.unshift({ name: 'Bitcoin', symbol: 'BTC', pattern: '1..., bc1...' })
