@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { setInterval } from 'timers'
+import { config } from '../config'
 
-// Request rate limiter using in-memory store
 const requestStore = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW = 60000 // 1 minute in ms
-const RATE_LIMIT_MAX_REQUESTS = 30 // 30 requests per minute per IP
 
 export const rateLimiter = (req: Request, res: Response, next: NextFunction) => {
   const clientIP =
@@ -18,14 +16,14 @@ export const rateLimiter = (req: Request, res: Response, next: NextFunction) => 
     // Reset or create new entry
     client = {
       count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
+      resetTime: now + config.rateLimit.windowMs,
     }
     requestStore.set(clientIP as string, client)
     return next()
   }
 
   // Check rate limit
-  if (client.count >= RATE_LIMIT_MAX_REQUESTS) {
+  if (client.count >= config.rateLimit.maxRequests) {
     return res.status(429).json({
       success: false,
       error: 'Too many requests. Please try again later.',
