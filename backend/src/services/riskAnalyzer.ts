@@ -1,4 +1,4 @@
-import type { AddressData } from '../types'
+import type { AddressData, BlockchainType } from '../types'
 
 interface Transaction {
   value: string
@@ -128,7 +128,8 @@ const analyzeValuePatterns = (addressInfo: AddressInfo): { score: number; findin
 // Main analysis function
 export const analyzeAddress = (
   addressInfo: AddressInfo,
-  transactions: Transaction[]
+  transactions: Transaction[],
+  blockchain: BlockchainType = 'ethereum'
 ): AddressData => {
   const findings: string[] = []
   let totalRiskScore = 0
@@ -207,7 +208,7 @@ export const analyzeAddress = (
     transaction_count: addressInfo.transaction_count || 0,
     total_value: addressInfo.received_usd || '0',
     recommendation,
-    blockchain: 'ethereum',
+    blockchain,
     balance: addressInfo.balance || '0',
   }
 }

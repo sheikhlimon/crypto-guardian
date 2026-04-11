@@ -32,7 +32,8 @@ export const checkAddress = async (address: string) => {
         transaction_count: addressData?.transaction_count || 0,
         balance: addressData?.balance || '0',
       },
-      []
+      [],
+      blockchain
     )
 
     const result = {
@@ -58,7 +59,8 @@ export const checkAddress = async (address: string) => {
         balance: '0',
         transaction_count: 0,
       },
-      []
+      [],
+      validation.blockchain
     )
 
     return {
