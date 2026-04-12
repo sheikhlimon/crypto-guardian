@@ -15,6 +15,9 @@ export interface AddressData {
   recommendation: string
   blockchain: string
   balance: string
+  blacklistInfo?: {
+    source: string
+  }
 }
 
 // Blockchain Types

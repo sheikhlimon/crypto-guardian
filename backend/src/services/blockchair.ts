@@ -1,5 +1,6 @@
 import NodeCache from 'node-cache'
 import { analyzeAddress } from './riskAnalyzer'
+import { isBlacklisted } from './blacklist'
 import { validateAddress } from '../utils/addressValidator'
 import { getAddressData } from './blockchainApis'
 import { config } from '../config'
@@ -20,6 +21,29 @@ export const checkAddress = async (address: string) => {
     const cacheKey = `${blockchain}-${normalizedAddress}`
     const cached = cache.get(cacheKey)
     if (cached) return cached
+
+    // Check scam blacklist before running heuristic analysis
+    const flagged = await isBlacklisted(normalizedAddress)
+
+    if (flagged) {
+      const result = {
+        address: normalizedAddress,
+        verdict: 'MALICIOUS' as const,
+        risk_score: 100,
+        findings: ['Address found in ScamSniffer scam database'],
+        transaction_count: 0,
+        total_value: '0',
+        recommendation: 'AVOID - This address is listed in a known scam database',
+        blockchain,
+        balance: '0',
+        blacklistInfo: {
+          source: 'scamsniffer',
+        },
+      }
+
+      cache.set(cacheKey, result)
+      return result
+    }
 
     const addressData = ((await getAddressData(normalizedAddress, blockchain)) as {
       transaction_count?: number

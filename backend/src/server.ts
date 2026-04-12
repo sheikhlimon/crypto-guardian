@@ -2,6 +2,7 @@ import express, { Express } from 'express'
 import checkAddressRoutes from './routes/checkAddress'
 import { corsHeaders, rateLimiter, validateRequest, securityHeaders } from './middleware/security'
 import { initializePriceCache } from './services/priceAPI'
+import { loadBlacklist } from './services/blacklist'
 import { config } from './config'
 
 const app: Express = express()
@@ -74,10 +75,12 @@ app.use((err: unknown, req: express.Request, res: express.Response) => {
 app.listen(config.port, () => {
   console.error('Crypto Guardian API running on port', config.port)
 
-  // Initialize price cache asynchronously
+  // Initialize price cache and blacklist asynchronously
   initializePriceCache()
     .then(() => console.error('Price cache initialized'))
     .catch(err => console.error('Failed to initialize price cache:', err))
+
+  loadBlacklist().catch(err => console.error('Failed to load blacklist:', err))
 })
 
 export default app
