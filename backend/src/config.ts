@@ -31,11 +31,12 @@ export const config = {
 
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY || '',
-    baseUrls: {
-      ethereum: 'https://api.etherscan.io',
-      'binance-smart-chain': 'https://api.bscscan.com',
-      polygon: 'https://api.polygonscan.com',
-      arbitrum: 'https://api.arbiscan.io',
+    baseUrl: 'https://api.etherscan.io/v2/api',
+    chainIds: {
+      ethereum: 1,
+      'binance-smart-chain': 56,
+      polygon: 137,
+      arbitrum: 42161,
     },
   },
 

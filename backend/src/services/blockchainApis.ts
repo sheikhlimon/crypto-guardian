@@ -33,7 +33,7 @@ const rateLimit = (provider: string) => {
 
 const EVM_CHAINS = ['ethereum', 'binance-smart-chain', 'polygon', 'arbitrum']
 
-// Etherscan API — supports Ethereum and EVM chains
+// Etherscan API V2 — unified multichain endpoint
 const etherscanAPI = async (
   address: string,
   blockchain: BlockchainType
@@ -41,15 +41,16 @@ const etherscanAPI = async (
   if (!EVM_CHAINS.includes(blockchain)) return null
   await rateLimit('etherscan')
 
-  const baseUrl = config.etherscan.baseUrls[blockchain as keyof typeof config.etherscan.baseUrls]
-  if (!baseUrl) return null
+  const chainId = config.etherscan.chainIds[blockchain as keyof typeof config.etherscan.chainIds]
+  if (!chainId) return null
 
   const apiKeys = config.etherscan.apiKey ? config.etherscan.apiKey.split(',') : ['']
 
   for (const key of apiKeys) {
     try {
-      const response = await axios.get(`${baseUrl}/api`, {
+      const response = await axios.get(config.etherscan.baseUrl, {
         params: {
+          chainid: chainId,
           module: 'account',
           action: 'balance',
           address,
