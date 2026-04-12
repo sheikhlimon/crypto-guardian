@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express, { Express } from 'express'
 import checkAddressRoutes from './routes/checkAddress'
 import { corsHeaders, rateLimiter, validateRequest, securityHeaders } from './middleware/security'

@@ -115,7 +115,7 @@ const localAnalysis = (address: string): AddressData => ({
   total_value: '0',
 })
 
-// Try multiple APIs in parallel, return first success
+// Try multiple APIs in parallel, merge best results
 export const getAddressData = async (
   address: string,
   blockchain: BlockchainType
@@ -129,24 +129,38 @@ export const getAddressData = async (
 
   if (apiPromises.length === 0) return localAnalysis(address)
 
-  try {
-    const result = await Promise.race([
-      Promise.any(apiPromises),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('API timeout')), config.api.raceTimeout)
-      ),
-    ])
+  const results = await Promise.allSettled(apiPromises)
 
-    if (result?.balance) {
-      try {
-        result.total_value = await convertToUSD(result.balance, blockchain)
-      } catch {
-        result.total_value = '0'
-      }
+  const successes = results
+    .filter(
+      (r): r is PromiseFulfilledResult<AddressData | null> =>
+        r.status === 'fulfilled' && r.value !== null
+    )
+    .map(r => r.value as AddressData)
+
+  if (successes.length === 0) return localAnalysis(address)
+
+  // Merge: prefer Etherscan balance, BlockCypher tx count
+  const merged: AddressData = { address }
+  for (const res of successes) {
+    if (res.balance && (!merged.balance || merged.balance === '0')) {
+      merged.balance = res.balance
     }
-
-    return result || localAnalysis(address)
-  } catch {
-    return localAnalysis(address)
+    if (res.transaction_count && (!merged.transaction_count || merged.transaction_count === 0)) {
+      merged.transaction_count = res.transaction_count
+    }
+    if (res.total_value && (!merged.total_value || merged.total_value === '0')) {
+      merged.total_value = res.total_value
+    }
   }
+
+  if (merged.balance) {
+    try {
+      merged.total_value = await convertToUSD(merged.balance, blockchain)
+    } catch {
+      merged.total_value = '0'
+    }
+  }
+
+  return merged
 }
