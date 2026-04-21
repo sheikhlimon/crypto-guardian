@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import AddressInput from './components/AddressInput'
 import ResultCard from './components/ResultCard'
 import { Shield, Sparkles, Lock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import type { AddressCheckResponse } from './types/api'
+import { checkAddress, startHealthPoll } from './services/api'
+
+export type LoadingStatus = 'idle' | 'connecting' | 'waking_up' | 'analyzing'
 
 function App() {
   const [result, setResult] = useState<AddressCheckResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>('idle')
   const [analysisComplete, setAnalysisComplete] = useState(false)
   const [hasLoaded, setHasLoaded] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+  const stopPollRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     const warmUpBackend = async () => {
@@ -26,6 +32,64 @@ function App() {
       setHasLoaded(true)
     }
     warmUpBackend()
+  }, [])
+
+  const handleSubmit = useCallback(async (address: string) => {
+    setIsLoading(true)
+    setLoadingStatus('connecting')
+    setResult(null)
+    setAnalysisComplete(false)
+
+    const controller = new AbortController()
+
+    let serverIsUp = false
+    let retryOnUp: (() => void) | null = null
+
+    const stopPoll = startHealthPoll(status => {
+      setLoadingStatus(status)
+      if (status === 'analyzing') {
+        serverIsUp = true
+        retryOnUp?.()
+      }
+    })
+    stopPollRef.current = stopPoll
+
+    // Try immediately (fast path if server is already warm)
+    let result = await checkAddress(address, controller.signal)
+
+    // If it failed with a network error, server was likely sleeping — wait for it
+    if (!result.success) {
+      const isNetworkError = /fetch|network|timeout|NetworkError/i.test(result.error || '')
+
+      if (isNetworkError && !serverIsUp) {
+        await new Promise<void>(resolve => {
+          if (serverIsUp) {
+            resolve()
+          } else {
+            retryOnUp = resolve
+          }
+        })
+
+        // Server is up, retry
+        setLoadingStatus('analyzing')
+        result = await checkAddress(address, controller.signal)
+      }
+    }
+
+    stopPoll()
+    stopPollRef.current = null
+    abortRef.current = null
+
+    if (result.success && result.data) {
+      setResult(result.data)
+      setAnalysisComplete(true)
+    } else {
+      setResult(null)
+      setAnalysisComplete(false)
+    }
+
+    setLoadingStatus('idle')
+    setIsLoading(false)
   }, [])
 
   return (
@@ -87,10 +151,9 @@ function App() {
         {/* Input */}
         <div className='mb-8'>
           <AddressInput
-            onCheck={setResult}
+            onSubmit={handleSubmit}
             isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            setAnalysisComplete={setAnalysisComplete}
+            loadingStatus={loadingStatus}
           />
         </div>
 

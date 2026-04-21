@@ -1,29 +1,35 @@
 import { useState, type FormEvent } from 'react'
 import { Search, AlertCircle, Shield } from 'lucide-react'
-import { checkAddress } from '../services/api'
 import { validateCryptoAddress, debounce } from '../utils/fp'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card, CardContent } from './ui/card'
-import type { AddressCheckResponse } from '../types/api'
+import type { LoadingStatus } from '../App'
 
 interface AddressInputProps {
-  onCheck: (result: AddressCheckResponse) => void
+  onSubmit: (address: string) => void
   isLoading: boolean
-  setIsLoading: (loading: boolean) => void
-  setAnalysisComplete: (complete: boolean) => void
+  loadingStatus: LoadingStatus
 }
 
-export default function AddressInput({
-  onCheck,
-  isLoading,
-  setIsLoading,
-  setAnalysisComplete,
-}: AddressInputProps) {
+const statusMessages: Record<LoadingStatus, string> = {
+  idle: '',
+  connecting: 'Analyzing address...',
+  waking_up: 'Server is waking from sleep...',
+  analyzing: 'Connected, analyzing address...',
+}
+
+const buttonLabels: Record<LoadingStatus, string> = {
+  idle: 'Check Wallet Safety',
+  connecting: 'Analyzing...',
+  waking_up: 'Waking server...',
+  analyzing: 'Analyzing...',
+}
+
+export default function AddressInput({ onSubmit, isLoading, loadingStatus }: AddressInputProps) {
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
-  const [isWakingUp, setIsWakingUp] = useState(false)
 
   const validateAddress = (value: string) => {
     if (!value) {
@@ -64,30 +70,7 @@ export default function AddressInput({
       return
     }
 
-    setIsLoading(true)
-    setError('')
-    setIsWakingUp(false)
-
-    const wakeUpTimer = setTimeout(() => setIsWakingUp(true), 3000)
-
-    try {
-      const result = await checkAddress(address)
-
-      if (result.success && result.data) {
-        onCheck(result.data)
-        setAnalysisComplete(true)
-      } else {
-        setError(result.error || 'Failed to check address')
-        setAnalysisComplete(false)
-      }
-    } catch {
-      setError('Something went wrong. Please try again.')
-      setAnalysisComplete(false)
-    } finally {
-      clearTimeout(wakeUpTimer)
-      setIsLoading(false)
-      setIsWakingUp(false)
-    }
+    onSubmit(address)
   }
 
   return (
@@ -116,13 +99,11 @@ export default function AddressInput({
                 autoComplete='off'
                 spellCheck={false}
               />
-              <div className='absolute right-3 top-1/2 -translate-y-1/2'>
-                {isLoading ? (
-                  <div className='animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full' />
-                ) : (
+              {!isLoading && (
+                <div className='absolute right-3 top-1/2 -translate-y-1/2'>
                   <Search className='h-4 w-4 text-muted-foreground' />
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Error */}
@@ -142,11 +123,7 @@ export default function AddressInput({
               {isLoading ? (
                 <>
                   <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
-                  <span>
-                    {isWakingUp
-                      ? 'Waking up server, this can take up to 50s...'
-                      : 'Checking Address...'}
-                  </span>
+                  <span>{buttonLabels[loadingStatus]}</span>
                 </>
               ) : (
                 <>
@@ -156,6 +133,14 @@ export default function AddressInput({
               )}
             </Button>
           </form>
+
+          {/* Status bar */}
+          {isLoading && loadingStatus !== 'idle' && (
+            <div className='mt-3 flex items-center gap-2 text-xs text-muted-foreground font-mono'>
+              <div className='w-1.5 h-1.5 rounded-full bg-primary animate-pulse' />
+              <span>{statusMessages[loadingStatus]}</span>
+            </div>
+          )}
         </CardContent>
       </Card>
 

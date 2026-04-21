@@ -1,9 +1,10 @@
 import type { AddressCheckRequest, AddressCheckResponse } from '../types/api'
-import { handleApiResponse } from '../utils/fp'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 // Simple API client
+type LoadingStatus = 'idle' | 'connecting' | 'waking_up' | 'analyzing'
+
 class APIClient {
   private baseURL: string
 
@@ -11,15 +12,14 @@ class APIClient {
     this.baseURL = baseURL
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseURL}/api${endpoint}`
+  async checkAddress(address: string, signal?: AbortSignal): Promise<AddressCheckResponse> {
+    const url = `${this.baseURL}/api/check-address`
 
     const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address } satisfies AddressCheckRequest),
+      signal: signal ?? AbortSignal.timeout(60_000),
     })
 
     const data = await response.json()
@@ -28,74 +28,63 @@ class APIClient {
       throw new Error(data.error || `HTTP error! status: ${response.status}`)
     }
 
-    return data
+    return data.data
   }
 
-  async checkAddress(address: string): Promise<AddressCheckResponse> {
-    const requestBody: AddressCheckRequest = { address }
+  async isHealthy(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseURL}/health`, {
+        signal: AbortSignal.timeout(5_000),
+      })
+      return response.ok
+    } catch {
+      return false
+    }
+  }
 
-    // Add retry logic for cold starts
-    const maxRetries = 3
+  startHealthPoll(onStatusChange: (status: LoadingStatus) => void, intervalMs = 4_000): () => void {
+    let stopped = false
+    let healthSucceeded = false
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await this.request<{ success: boolean; data: AddressCheckResponse }>(
-          '/check-address',
-          {
-            method: 'POST',
-            body: JSON.stringify(requestBody),
-            // signal: AbortSignal.timeout(baseTimeout * attempt), // Increase timeout for each retry
-          }
-        )
+    const poll = async () => {
+      if (stopped) return
 
-        // Backend returns wrapped response with success and data
-        // Return the unwrapped data
-        return response.data
-      } catch (error) {
-        // If it's a timeout or connection error and we have retries left, try again
-        if (
-          error instanceof Error &&
-          (error.message.includes('timeout') || error.message.includes('fetch')) &&
-          attempt < maxRetries
-        ) {
-          console.warn(`Retry attempt ${attempt}/${maxRetries} for address check`)
-          // Wait before retry (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
-          continue
-        }
-        throw error
+      const healthy = await this.isHealthy()
+      if (stopped) return
+
+      if (healthy && !healthSucceeded) {
+        healthSucceeded = true
+        onStatusChange('analyzing')
+      } else if (!healthy && !healthSucceeded) {
+        onStatusChange('waking_up')
       }
     }
 
-    throw new Error('Failed after maximum retry attempts')
-  }
+    // Start polling after a short initial delay
+    const timeoutId = setTimeout(() => {
+      poll()
+      const id = setInterval(poll, intervalMs)
+      // Store cleanup — replace the outer stop fn
+      stop = () => {
+        stopped = true
+        clearInterval(id)
+      }
+    }, 2_000)
 
-  async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    const url = `${this.baseURL}/health`
-
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`)
+    let stop = () => {
+      stopped = true
+      clearTimeout(timeoutId)
     }
 
-    return data
+    return () => stop()
   }
 }
 
-// Create and export API client instance
 const apiClient = new APIClient(API_BASE_URL)
 
-// Export simple API functions
-export const checkAddress = async (address: string) => {
+export const checkAddress = async (address: string, signal?: AbortSignal) => {
   try {
-    const data = await apiClient.checkAddress(address)
+    const data = await apiClient.checkAddress(address, signal)
     return { success: true, data }
   } catch (error) {
     return {
@@ -105,8 +94,7 @@ export const checkAddress = async (address: string) => {
   }
 }
 
-export const healthCheck = async () => {
-  return handleApiResponse(apiClient.healthCheck())
-}
+export const startHealthPoll = (onStatusChange: (status: LoadingStatus) => void) =>
+  apiClient.startHealthPoll(onStatusChange)
 
 export default apiClient
