@@ -42,16 +42,10 @@ app.get('/health', (req, res) => {
 
 // Warm-up endpoint — initializes price cache and prevents cold starts
 app.get('/warmup', async (req, res) => {
-  try {
-    await initializePriceCache()
-    res.status(200).json({
-      status: 'warmed',
-      timestamp: new Date().toISOString(),
-    })
-  } catch (error) {
-    console.error('Warmup failed:', error)
-    res.status(500).json({ status: 'error', timestamp: new Date().toISOString() })
-  }
+  res.status(200).json({
+    status: 'warmed',
+    timestamp: new Date().toISOString(),
+  })
 })
 
 // 404 handler

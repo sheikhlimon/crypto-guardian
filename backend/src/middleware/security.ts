@@ -58,10 +58,7 @@ export const corsHeaders = (req: Request, res: Response, next: NextFunction) => 
   )
   res.header('Access-Control-Max-Age', '86400')
 
-  console.error(`CORS Request - Method: ${req.method}, Origin: ${req.headers.origin}`)
-
   if (req.method === 'OPTIONS') {
-    console.error('CORS - Responding 200 to OPTIONS')
     res.sendStatus(200)
     return
   }

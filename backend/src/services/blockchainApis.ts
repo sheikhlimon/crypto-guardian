@@ -90,13 +90,11 @@ const blockCypherAPI = async (
     )
 
     const data = response.data
-    const divisor = blockchain === 'bitcoin' ? 100_000_000 : 1
-
     return {
       address,
       balance: data.balance?.toString() || '0',
       transaction_count: data.n_tx || 0,
-      total_value: (parseFloat(data.total_received || '0') / divisor).toString(),
+      total_value: data.total_received?.toString() || '0',
     }
   } catch (error) {
     console.error(
@@ -154,7 +152,14 @@ export const getAddressData = async (
     }
   }
 
-  if (merged.balance) {
+  // Convert total_value to USD if we have it, otherwise convert balance as fallback
+  if (merged.total_value && merged.total_value !== '0') {
+    try {
+      merged.total_value = await convertToUSD(merged.total_value, blockchain)
+    } catch {
+      merged.total_value = '0'
+    }
+  } else if (merged.balance && merged.balance !== '0') {
     try {
       merged.total_value = await convertToUSD(merged.balance, blockchain)
     } catch {

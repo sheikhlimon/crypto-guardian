@@ -55,6 +55,7 @@ export const checkAddress = async (address: string) => {
       {
         transaction_count: addressData?.transaction_count || 0,
         balance: addressData?.balance || '0',
+        received_usd: addressData?.total_value || '0',
       },
       blockchain
     )

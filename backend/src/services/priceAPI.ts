@@ -5,13 +5,12 @@ import { config } from '../config'
 
 const priceCache = new NodeCache({ stdTTL: config.cache.priceTtl })
 
-// Map blockchain types to CoinGecko IDs
-const blockchainToCoinId: Record<BlockchainType, string> = {
-  ethereum: 'ethereum',
-  bitcoin: 'bitcoin',
-  'binance-smart-chain': 'binancecoin',
-  polygon: 'matic-network',
-  arbitrum: 'arbitrum',
+const blockchainToCoinbase: Record<BlockchainType, string> = {
+  ethereum: 'ETH',
+  bitcoin: 'BTC',
+  'binance-smart-chain': 'BNB',
+  polygon: 'MATIC',
+  arbitrum: 'ARB',
 }
 
 export const getCurrentPrice = async (blockchain: BlockchainType): Promise<number> => {
@@ -20,37 +19,44 @@ export const getCurrentPrice = async (blockchain: BlockchainType): Promise<numbe
   if (cachedPrice) return cachedPrice
 
   try {
-    const coinId = blockchainToCoinId[blockchain]
+    if (blockchain === 'bitcoin') {
+      // Blockchain.info returns all fiat prices in one call
+      const response = await axios.get('https://blockchain.info/ticker', {
+        timeout: config.api.timeout,
+        headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
+      })
+      const price = response.data?.USD?.last || 0
+      if (price > 0) {
+        priceCache.set(cacheKey, price)
+        return price
+      }
+    }
 
-    const response = await axios.get(`${config.coingecko.baseUrl}/simple/price`, {
-      params: { ids: coinId, vs_currencies: 'usd' },
+    // Coinbase spot price endpoint, no auth needed
+    const symbol = blockchainToCoinbase[blockchain]
+    const response = await axios.get(`https://api.coinbase.com/v2/prices/${symbol}-USD/spot`, {
       timeout: config.api.timeout,
-      headers: { 'User-Agent': 'Crypto-Guardian/1.0', Accept: 'application/json' },
+      headers: { 'User-Agent': 'Crypto-Guardian/1.0' },
     })
-
-    const price = response.data[coinId]?.usd || 0
+    const price = parseFloat(response.data?.data?.amount || '0')
     if (price > 0) {
       priceCache.set(cacheKey, price)
       return price
     }
   } catch (error) {
-    console.error(
-      'CoinGecko fetch failed:',
-      error instanceof Error ? error.message : 'Unknown error'
-    )
+    console.error('Price fetch failed:', error instanceof Error ? error.message : 'Unknown error')
   }
 
-  // Cache miss for 1 minute so we don't hammer the API
   priceCache.set(cacheKey, 0, 60)
   return 0
 }
 
 // Convert raw balance (wei/satoshi) to standard units
 const convertBalance = (balance: string, blockchain: BlockchainType): number => {
-  if (blockchain === 'bitcoin') {
-    return Number(BigInt(balance) || 0n) / 100_000_000
-  }
-  return Number(BigInt(balance) || 0n) / 1e18
+  const raw = Number(balance)
+  if (isNaN(raw) || raw === 0) return 0
+  const divisor = blockchain === 'bitcoin' ? 100_000_000 : 1e18
+  return raw / divisor
 }
 
 export const convertToUSD = async (
@@ -82,6 +88,4 @@ export const initializePriceCache = async () => {
       getCurrentPrice(chain).catch(err => console.error(`Failed to fetch price for ${chain}:`, err))
     )
   )
-
-  console.error('Price cache initialized')
 }

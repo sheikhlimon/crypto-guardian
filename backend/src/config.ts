@@ -39,8 +39,4 @@ export const config = {
       arbitrum: 42161,
     },
   },
-
-  coingecko: {
-    baseUrl: 'https://api.coingecko.com/api/v3',
-  },
 } as const

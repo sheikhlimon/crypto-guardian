@@ -1,6 +1,6 @@
 # Crypto Guardian
 
-A crypto wallet safety checker that lets you paste any blockchain address and instantly see if it's safe to interact with. It pulls data from Etherscan, BlockCypher, and CoinGecko to analyze transaction patterns, check against known scam databases, and assign a risk score — so you can avoid sending funds to a malicious wallet.
+A crypto wallet safety checker. Paste any blockchain address and instantly see if it's safe to interact with. Analyzes transaction patterns, checks against known scam databases, and assigns a risk score.
 
 Built with React, TypeScript, and Express. Supports Ethereum, Bitcoin, and EVM chains.
 
@@ -23,15 +23,15 @@ pnpm dev
 
 ```bash
 cp backend/.env.example backend/.env
-# Add Etherscan API key (free): https://etherscan.io/apis
-ETHERSCAN_API_KEY=your_key_here
+# Add your Etherscan API key (free): https://etherscan.io/apis
 ```
 
 ## Tech Stack
 
 - **Frontend**: Vite + React + TypeScript + Tailwind CSS + Radix UI
 - **Backend**: Node.js + Express + TypeScript
-- **APIs**: Etherscan (V2), BlockCypher, CoinGecko
+- **APIs**: Etherscan V2 (free key), BlockCypher (free)
+- **Prices**: Blockchain.info (BTC), Coinbase (ETH, BNB, MATIC, ARB)
 - **Blacklist**: ScamSniffer (community-maintained scam address database)
 
 ## API
@@ -47,12 +47,12 @@ ETHERSCAN_API_KEY=your_key_here
   "success": true,
   "data": {
     "address": "0x165cd37b4c644c2921454429e7f9358d18a45e14",
-    "verdict": "SUSPICIOUS",
-    "risk_score": 40,
-    "findings": ["Extremely high transaction volume — possible automated activity"],
+    "verdict": "CLEAN",
+    "risk_score": 10,
+    "findings": ["High transaction volume with low value"],
     "transaction_count": 78958,
     "total_value": "348.57",
-    "recommendation": "CAUTION - Some suspicious patterns detected",
+    "recommendation": "No suspicious activity detected",
     "blockchain": "ethereum",
     "balance": "157955776415709087"
   }
@@ -61,7 +61,7 @@ ETHERSCAN_API_KEY=your_key_here
 
 #### Blacklist Hit
 
-If the address is found in the ScamSniffer database, the response short-circuits to:
+If the address is found in the ScamSniffer database:
 
 ```json
 {
@@ -73,7 +73,6 @@ If the address is found in the ScamSniffer database, the response short-circuits
     "blacklistInfo": { "source": "scamsniffer" }
   }
 }
-```
 ```
 
 ## License

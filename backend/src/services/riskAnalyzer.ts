@@ -16,23 +16,31 @@ export const analyzeAddress = (
   const txCount = addressInfo.transaction_count || 0
   const balance = parseFloat(addressInfo.balance || '0')
   const totalValue = parseFloat(addressInfo.received_usd || '0')
+  const isHighValue = totalValue >= 10000
+  const isDrained = balance === 0 && totalValue > 0
 
-  // High transaction volume — unusual for personal wallets
-  if (txCount > 5000) {
-    totalRiskScore += 40
-    findings.push('Extremely high transaction volume — possible automated activity')
+  // High tx volume is only concerning for drained addresses
+  if (txCount > 5000 && isDrained && isHighValue) {
+    totalRiskScore += 35
+    findings.push('Drained high-value address with extreme transaction volume')
+  } else if (txCount > 1000 && isDrained && isHighValue) {
+    totalRiskScore += 25
+    findings.push('Drained high-value address with high transaction volume')
+  } else if (txCount > 5000 && isHighValue) {
+    totalRiskScore += 10
+    findings.push('High transaction volume with significant value')
+  } else if (txCount > 5000) {
+    totalRiskScore += 5
+    findings.push('High transaction volume with low value')
   } else if (txCount > 1000) {
-    totalRiskScore += 30
-    findings.push('High transaction volume — typical of exchanges or mixers')
-  } else if (txCount > 500) {
-    totalRiskScore += 15
-    findings.push('Moderate transaction volume detected')
+    totalRiskScore += 5
+    findings.push('Moderate transaction volume')
   }
 
   // Drained high-value address — funds moved through but nothing remains
-  if (balance === 0 && txCount > 100 && totalValue > 50000) {
-    totalRiskScore += 15
-    findings.push('Address fully drained after significant value flow')
+  if (isDrained && txCount > 100 && isHighValue) {
+    totalRiskScore += 20
+    findings.push('Address drained after receiving significant funds')
   }
 
   // Determine verdict
@@ -42,7 +50,7 @@ export const analyzeAddress = (
   if (totalRiskScore >= 50) {
     verdict = 'MALICIOUS'
     recommendation = 'AVOID - This address shows highly suspicious activity patterns'
-  } else if (totalRiskScore >= 25) {
+  } else if (totalRiskScore >= 20) {
     verdict = 'SUSPICIOUS'
     recommendation = 'CAUTION - Some suspicious patterns detected'
   } else {
@@ -55,7 +63,7 @@ export const analyzeAddress = (
   }
 
   return {
-    address: '', // Will be set by caller
+    address: '',
     verdict,
     risk_score: Math.min(totalRiskScore, 100),
     findings,
