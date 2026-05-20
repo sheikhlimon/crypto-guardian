@@ -2,11 +2,10 @@
 
 echo "🔍 Running pre-commit checks..."
 
-echo "📱 Checking frontend..."
-cd frontend
 npx lint-staged
+
 if [ $? -ne 0 ]; then
-  echo "❌ Frontend linting failed"
+  echo "❌ Linting failed"
   exit 1
 fi
 
