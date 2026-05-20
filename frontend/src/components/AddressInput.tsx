@@ -4,29 +4,13 @@ import { validateCryptoAddress, debounce } from '../utils/fp'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Card, CardContent } from './ui/card'
-import type { LoadingStatus } from '../App'
 
 interface AddressInputProps {
   onSubmit: (address: string) => void
   isLoading: boolean
-  loadingStatus: LoadingStatus
 }
 
-const statusMessages: Record<LoadingStatus, string> = {
-  idle: '',
-  connecting: 'Analyzing address...',
-  waking_up: 'Server is waking from sleep...',
-  analyzing: 'Connected, analyzing address...',
-}
-
-const buttonLabels: Record<LoadingStatus, string> = {
-  idle: 'Check Wallet Safety',
-  connecting: 'Analyzing...',
-  waking_up: 'Waking server...',
-  analyzing: 'Analyzing...',
-}
-
-export default function AddressInput({ onSubmit, isLoading, loadingStatus }: AddressInputProps) {
+export default function AddressInput({ onSubmit, isLoading }: AddressInputProps) {
   const [address, setAddress] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
@@ -123,7 +107,7 @@ export default function AddressInput({ onSubmit, isLoading, loadingStatus }: Add
               {isLoading ? (
                 <>
                   <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
-                  <span>{buttonLabels[loadingStatus]}</span>
+                  <span>Analyzing...</span>
                 </>
               ) : (
                 <>
@@ -135,10 +119,10 @@ export default function AddressInput({ onSubmit, isLoading, loadingStatus }: Add
           </form>
 
           {/* Status bar */}
-          {isLoading && loadingStatus !== 'idle' && (
+          {isLoading && (
             <div className='mt-3 flex items-center gap-2 text-xs text-muted-foreground font-mono'>
               <div className='w-1.5 h-1.5 rounded-full bg-primary animate-pulse' />
-              <span>{statusMessages[loadingStatus]}</span>
+              <span>Analyzing address...</span>
             </div>
           )}
         </CardContent>

@@ -1,94 +1,33 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import AddressInput from './components/AddressInput'
 import ResultCard from './components/ResultCard'
 import { Shield, Sparkles, Lock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 import type { AddressCheckResponse } from './types/api'
-import { checkAddress, startHealthPoll } from './services/api'
-
-export type LoadingStatus = 'idle' | 'connecting' | 'waking_up' | 'analyzing'
+import { checkAddress } from './services/api'
 
 function App() {
   const [result, setResult] = useState<AddressCheckResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>('idle')
-  const [analysisComplete, setAnalysisComplete] = useState(false)
-  const [hasLoaded, setHasLoaded] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
-  const stopPollRef = useRef<(() => void) | null>(null)
-
-  useEffect(() => {
-    const warmUpBackend = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/warmup`
-        )
-        if (response.ok) {
-          console.warn('Backend warmed up successfully')
-        }
-      } catch (error) {
-        console.warn('Backend warmup failed, but continuing:', error)
-      }
-      setHasLoaded(true)
-    }
-    warmUpBackend()
-  }, [])
 
   const handleSubmit = useCallback(async (address: string) => {
     setIsLoading(true)
-    setLoadingStatus('connecting')
     setResult(null)
-    setAnalysisComplete(false)
 
     const controller = new AbortController()
+    abortRef.current = controller
 
-    let serverIsUp = false
-    let retryOnUp: (() => void) | null = null
+    const result = await checkAddress(address, controller.signal)
 
-    const stopPoll = startHealthPoll(status => {
-      setLoadingStatus(status)
-      if (status === 'analyzing') {
-        serverIsUp = true
-        retryOnUp?.()
-      }
-    })
-    stopPollRef.current = stopPoll
-
-    // Try immediately (fast path if server is already warm)
-    let result = await checkAddress(address, controller.signal)
-
-    // If it failed with a network error, server was likely sleeping — wait for it
-    if (!result.success) {
-      const isNetworkError = /fetch|network|timeout|NetworkError/i.test(result.error || '')
-
-      if (isNetworkError && !serverIsUp) {
-        await new Promise<void>(resolve => {
-          if (serverIsUp) {
-            resolve()
-          } else {
-            retryOnUp = resolve
-          }
-        })
-
-        // Server is up, retry
-        setLoadingStatus('analyzing')
-        result = await checkAddress(address, controller.signal)
-      }
-    }
-
-    stopPoll()
-    stopPollRef.current = null
     abortRef.current = null
 
     if (result.success && result.data) {
       setResult(result.data)
-      setAnalysisComplete(true)
     } else {
       setResult(null)
-      setAnalysisComplete(false)
     }
 
-    setLoadingStatus('idle')
     setIsLoading(false)
   }, [])
 
@@ -117,31 +56,9 @@ function App() {
       {/* Main */}
       <main className='max-w-2xl mx-auto px-4 py-12 relative z-10'>
         <div className='text-center mb-8'>
-          {/* Status */}
-          <div className='inline-flex items-center space-x-2 mb-6 text-xs font-mono text-muted-foreground'>
-            <div
-              className={`w-1.5 h-1.5 rounded-full ${
-                !hasLoaded
-                  ? 'bg-muted-foreground animate-pulse'
-                  : analysisComplete
-                    ? 'bg-emerald-500'
-                    : 'bg-primary'
-              }`}
-            />
-            <span>
-              {!hasLoaded
-                ? 'INITIALIZING'
-                : analysisComplete
-                  ? 'ANALYSIS COMPLETE'
-                  : 'SYSTEM READY'}
-            </span>
-          </div>
-
-          {/* Heading */}
           <h1 className='text-4xl md:text-5xl font-bold tracking-tight mb-3'>
             Check Wallet <span className='gradient-text'>Safety</span>
           </h1>
-
           <p className='text-muted-foreground text-base max-w-md mx-auto leading-relaxed'>
             Instant fraud detection for crypto addresses. Analyze wallet safety before you send
             funds.
@@ -150,11 +67,7 @@ function App() {
 
         {/* Input */}
         <div className='mb-8'>
-          <AddressInput
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            loadingStatus={loadingStatus}
-          />
+          <AddressInput onSubmit={handleSubmit} isLoading={isLoading} />
         </div>
 
         {/* Results */}
