@@ -2,7 +2,7 @@
 
 A crypto wallet safety checker. Paste any blockchain address and instantly see if it's safe to interact with. Analyzes transaction patterns, checks against known scam databases, and assigns a risk score.
 
-Built with React, TypeScript, and Express. Supports Ethereum, Bitcoin, and EVM chains.
+Built with React, TypeScript, and Vercel Serverless Functions. Supports Ethereum, Bitcoin, and EVM chains.
 
 ## Quick Start
 
@@ -11,8 +11,7 @@ pnpm install
 pnpm dev
 ```
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
+Frontend + API available at http://localhost:5173
 
 ## Prerequisites
 
@@ -21,18 +20,48 @@ pnpm dev
 
 ## Environment
 
-```bash
-cp backend/.env.example backend/.env
-# Add your Etherscan API key (free): https://etherscan.io/apis
+Set these in Vercel's dashboard (Settings → Environment Variables) or in `frontend/.env` for local development:
+
 ```
+ETHERSCAN_API_KEY=your_key_here
+```
+
+Get a free Etherscan API key at https://etherscan.io/apis
 
 ## Tech Stack
 
 - **Frontend**: Vite + React + TypeScript + Tailwind CSS + Radix UI
-- **Backend**: Node.js + Express + TypeScript
+- **API**: Vercel Serverless Functions (Node.js)
 - **APIs**: Etherscan V2 (free key), BlockCypher (free)
 - **Prices**: Blockchain.info (BTC), Coinbase (ETH, BNB, MATIC, ARB)
 - **Blacklist**: ScamSniffer (community-maintained scam address database)
+
+## Architecture
+
+```
+frontend/
+  api/                    # Vercel serverless functions
+    check-address.ts      # POST /api/check-address
+    supported-chains.ts   # GET /api/supported-chains
+  lib/                    # Shared business logic (used by serverless functions)
+    services/             # blockchainApis, riskAnalyzer, blacklist, priceAPI
+    types/                # TypeScript types
+    utils/                # Address validation
+    config.ts             # Environment config
+  src/                    # React frontend
+    services/api.ts       # Fetch client (same-origin /api/ calls)
+```
+
+The frontend calls `/api/*` on the same domain. In development, Vite's dev server runs the frontend, and the serverless functions run locally via Vercel CLI (`vercel dev`).
+
+For production, Vercel serves both the static frontend and the serverless functions from one deployment.
+
+## Deploy
+
+Push to GitHub and connect the repo to Vercel. Set:
+
+- **Root Directory**: `frontend`
+- **Environment Variable**: `ETHERSCAN_API_KEY`
 
 ## API
 

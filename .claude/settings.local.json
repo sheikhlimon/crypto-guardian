@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ddg-search__search",
+      "mcp__web-reader__webReader",
+      "mcp__fetch__fetch",
+      "Bash(curl -s -X POST http://localhost:3001/api/check-address -H 'Content-Type: application/json' -d '{\"address\":\"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\"}')",
+      "Bash(curl *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "fetch"
+  ]
+}

@@ -2,21 +2,11 @@
 
 echo "🔍 Running pre-commit checks..."
 
-# Frontend linting and formatting
 echo "📱 Checking frontend..."
 cd frontend
 npx lint-staged
 if [ $? -ne 0 ]; then
   echo "❌ Frontend linting failed"
-  exit 1
-fi
-
-# Backend linting and formatting
-echo "🔧 Checking backend..."
-cd ../backend
-npx lint-staged
-if [ $? -ne 0 ]; then
-  echo "❌ Backend linting failed"
   exit 1
 fi
 
