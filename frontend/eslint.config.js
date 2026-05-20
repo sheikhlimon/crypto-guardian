@@ -31,6 +31,8 @@ export default [
         HTMLDivElement: 'readonly',
         HTMLParagraphElement: 'readonly',
         HTMLHeadingElement: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
         RequestInit: 'readonly',
         fetch: 'readonly',
         setTimeout: 'readonly',
