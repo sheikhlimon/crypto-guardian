@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { convertToUSD } from './priceAPI'
-import { config } from '../config'
-import type { BlockchainType } from '../types'
+import { convertToUSD } from './priceAPI.js'
+import { config } from '../config.js'
+import type { BlockchainType } from '../types/index.js'
 
 interface AddressDataResult {
   address: string

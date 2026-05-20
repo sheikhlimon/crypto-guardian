@@ -1,4 +1,4 @@
-import type { AddressData, BlockchainType } from '../types'
+import type { AddressData, BlockchainType } from '../types/index.js'
 
 interface AddressInfo {
   transaction_count: number

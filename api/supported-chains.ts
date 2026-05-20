@@ -1,4 +1,4 @@
-import { SUPPORTED_CHAINS } from '../lib/utils/addressValidator'
+import { SUPPORTED_CHAINS } from '../lib/utils/addressValidator.js'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

@@ -1,5 +1,5 @@
-import { checkAddress } from '../lib/services/checkAddress'
-import { validateAddress } from '../lib/utils/addressValidator'
+import { checkAddress } from '../lib/services/checkAddress.js'
+import { validateAddress } from '../lib/utils/addressValidator.js'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

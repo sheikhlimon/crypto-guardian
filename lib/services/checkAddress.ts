@@ -1,7 +1,7 @@
-import { analyzeAddress } from './riskAnalyzer'
-import { isBlacklisted } from './blacklist'
-import { validateAddress } from '../utils/addressValidator'
-import { getAddressData } from './blockchainApis'
+import { analyzeAddress } from './riskAnalyzer.js'
+import { isBlacklisted } from './blacklist.js'
+import { validateAddress } from '../utils/addressValidator.js'
+import { getAddressData } from './blockchainApis.js'
 
 export const checkAddress = async (address: string) => {
   try {

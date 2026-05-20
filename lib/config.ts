@@ -1,4 +1,4 @@
-import type { BlockchainType } from './types'
+import type { BlockchainType } from './types/index.js'
 
 export const config = {
   cache: {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { config } from '../config'
+import { config } from '../config.js'
 
 const BLACKLIST_URL =
   'https://raw.githubusercontent.com/scamsniffer/scam-database/main/blacklist/address.json'

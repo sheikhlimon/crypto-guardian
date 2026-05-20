@@ -1,6 +1,6 @@
 import axios from 'axios'
-import type { BlockchainType } from '../types'
-import { config } from '../config'
+import type { BlockchainType } from '../types/index.js'
+import { config } from '../config.js'
 
 const blockchainToCoinbase: Record<BlockchainType, string> = {
   ethereum: 'ETH',

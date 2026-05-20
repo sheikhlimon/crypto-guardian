@@ -1,4 +1,4 @@
-import type { AddressValidationResult, BlockchainType } from '../types'
+import type { AddressValidationResult, BlockchainType } from '../types/index.js'
 
 const EVM_PATTERN = /^0x[a-fA-F0-9]{40}$/
 
