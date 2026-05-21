@@ -6,13 +6,13 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 }
 
-export default async function handler(request: Request) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: CORS_HEADERS })
-  }
-
+export async function GET(_request: Request) {
   return Response.json(
     { success: true, data: { chains: SUPPORTED_CHAINS } },
     { status: 200, headers: CORS_HEADERS }
   )
+}
+
+export async function OPTIONS(_request: Request) {
+  return new Response(null, { status: 200, headers: CORS_HEADERS })
 }

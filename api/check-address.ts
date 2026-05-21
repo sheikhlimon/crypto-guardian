@@ -11,18 +11,7 @@ export const config = {
   maxDuration: 30,
 }
 
-export default async function handler(request: Request) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: CORS_HEADERS })
-  }
-
-  if (request.method !== 'POST') {
-    return Response.json(
-      { success: false, error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' },
-      { status: 405, headers: CORS_HEADERS }
-    )
-  }
-
+export async function POST(request: Request) {
   let body: { address?: string }
   try {
     body = await request.json()
@@ -109,4 +98,8 @@ export default async function handler(request: Request) {
       { status: 500, headers: CORS_HEADERS }
     )
   }
+}
+
+export async function OPTIONS(_request: Request) {
+  return new Response(null, { status: 200, headers: CORS_HEADERS })
 }
